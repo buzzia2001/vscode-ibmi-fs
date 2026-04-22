@@ -211,8 +211,7 @@ export class Pgm extends Base {
           SQL_PACKAGE,
           SQL_RDB_CONNECTION_METHOD
         FROM QSYS2.PROGRAM_INFO
-        WHERE PROGRAM_LIBRARY = '${this.library}' AND PROGRAM_NAME='${this.name}'
-        Fetch first row only`,
+        WHERE PROGRAM_LIBRARY = '${this.library}' AND PROGRAM_NAME='${this.name}'`,
         'QSYS2',
         'PROGRAM_INFO',
         'VIEW'

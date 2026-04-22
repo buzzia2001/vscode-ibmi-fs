@@ -271,8 +271,7 @@ export namespace OutputQueueActions {
         connection,
         `SELECT NETWORK_CONNECTION_TYPE, NUMBER_OF_WRITERS
           FROM QSYS2.OUTPUT_QUEUE_INFO
-          WHERE OUTPUT_QUEUE_NAME = '${name}' AND OUTPUT_QUEUE_LIBRARY_NAME = '${library}'
-          FETCH FIRST ROW ONLY`,
+          WHERE OUTPUT_QUEUE_NAME = '${name}' AND OUTPUT_QUEUE_LIBRARY_NAME = '${library}'`,
         'QSYS2',
         'OUTPUT_QUEUE_INFO',
         'VIEW'
@@ -659,7 +658,7 @@ export default class Outq extends Base {
             DESTINATION_OPTIONS
             from QSYS2.OUTPUT_QUEUE_INFO
             WHERE OUTPUT_QUEUE_NAME = '${this.name}' AND OUTPUT_QUEUE_LIBRARY_NAME = '${this.library}'
-            Fetch first row only`,
+  `,
         'QSYS2',
         'OUTPUT_QUEUE_INFO',
         'VIEW'

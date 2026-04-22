@@ -110,8 +110,7 @@ export namespace JobQueueActions {
         connection,
         `SELECT JOB_QUEUE_STATUS
           FROM QSYS2.JOB_QUEUE_INFO
-          WHERE JOB_QUEUE_NAME = '${name}' AND JOB_QUEUE_LIBRARY = '${library}'
-          Fetch first row only`,
+          WHERE JOB_QUEUE_NAME = '${name}' AND JOB_QUEUE_LIBRARY = '${library}'`,
         'QSYS2',
         'JOB_QUEUE_INFO',
         'VIEW'
@@ -173,8 +172,7 @@ export namespace JobQueueActions {
         connection,
         `SELECT JOB_QUEUE_STATUS
           FROM QSYS2.JOB_QUEUE_INFO
-          WHERE JOB_QUEUE_NAME = '${name}' AND JOB_QUEUE_LIBRARY = '${library}'
-          Fetch first row only`,
+          WHERE JOB_QUEUE_NAME = '${name}' AND JOB_QUEUE_LIBRARY = '${library}'`,
         'QSYS2',
         'JOB_QUEUE_INFO',
         'VIEW'
@@ -419,8 +417,7 @@ export default class Jobq extends Base {
         `SELECT JOB_QUEUE_STATUS, NUMBER_OF_JOBS, SUBSYSTEM_LIBRARY_NAME CONCAT '/' CONCAT SUBSYSTEM_NAME AS SUBSYSTEM_NAME, MAXIMUM_ACTIVE_JOBS, ACTIVE_JOBS, HELD_JOBS,
             RELEASED_JOBS, SCHEDULED_JOBS, TEXT_DESCRIPTION
           FROM QSYS2.JOB_QUEUE_INFO
-          WHERE JOB_QUEUE_NAME = '${this.name}' AND JOB_QUEUE_LIBRARY = '${this.library}'
-          Fetch first row only`,
+          WHERE JOB_QUEUE_NAME = '${this.name}' AND JOB_QUEUE_LIBRARY = '${this.library}'`,
         'QSYS2',
         'JOB_QUEUE_INFO',
         'VIEW'

@@ -474,8 +474,7 @@ export class Usridx extends Base {
           OBJECT_DOMAIN,
           TEXT_DESCRIPTION
         FROM QSYS2.USER_INDEX_INFO
-        WHERE USER_INDEX_LIBRARY = '${this.library}' and USER_INDEX='${this.name}'
-        Fetch first row only`,
+        WHERE USER_INDEX_LIBRARY = '${this.library}' and USER_INDEX='${this.name}'`,
         'QSYS2',
         'USER_INDEX_INFO',
         'VIEW'

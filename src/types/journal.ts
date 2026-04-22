@@ -18,7 +18,7 @@ import Base from "./base";
 import { IBMiObject, CommandResult } from '@halcyontech/vscode-ibmi-types';
 import { Components } from "../webviewToolkit";
 import { getInstance } from "../ibmi";
-import { generateDetailTable, getColumns, generateFastTable, FastTableColumn, getProtected, openSqlTemplate, checkTableFunctionExists, checkViewExists, executeSqlIfExists } from "../tools";
+import { generateDetailTable, getColumns, generateFastTable, FastTableColumn, getProtected, checkTableFunctionExists, checkViewExists, executeSqlIfExists, openTextTemplate } from "../tools";
 import { Tools } from '@halcyontech/vscode-ibmi-types/api/Tools';
 import * as vscode from 'vscode';
 import ObjectProvider from '../objectProvider';
@@ -121,7 +121,7 @@ export namespace JournalActions {
         ) AS JT`;
     
     // Open the SQL template with the generated statement
-    return await openSqlTemplate(sqlStatement);
+    return await openTextTemplate(sqlStatement,'sql');
   };
 
   /**
@@ -282,8 +282,7 @@ export default class Jrn extends Base {
           to_char(MAXIMUM_BEHIND_TIMESTAMP, 'yyyy-mm-dd HH24:mi') as MAXIMUM_BEHIND_TIMESTAMP,
           JOURNAL_ENTRY_FILTERING
         FROM QSYS2.JOURNAL_INFO
-        where JOURNAL_NAME='${this.name}' and JOURNAL_LIBRARY= '${this.library}'
-          Fetch first row only`,
+        where JOURNAL_NAME='${this.name}' and JOURNAL_LIBRARY= '${this.library}'`,
         'QSYS2',
         'JOURNAL_INFO',
         'VIEW'

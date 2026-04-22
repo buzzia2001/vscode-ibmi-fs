@@ -444,8 +444,7 @@ export class Sbsd extends Base {
             IASP_NAME
           FROM QSYS2.SUBSYSTEM_INFO
           WHERE SUBSYSTEM_DESCRIPTION = '${this.name}'
-                AND SUBSYSTEM_DESCRIPTION_LIBRARY = '${this.library}'
-          Fetch first row only`,
+                AND SUBSYSTEM_DESCRIPTION_LIBRARY = '${this.library}'`,
         'QSYS2',
         'SUBSYSTEM_INFO',
         'VIEW'

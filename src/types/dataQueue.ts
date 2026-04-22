@@ -308,8 +308,7 @@ export class Dtaq extends Base {
         connection,
         `SELECT DATA_QUEUE_TYPE
         FROM QSYS2.DATA_QUEUE_INFO
-        WHERE DATA_QUEUE_NAME = '${this.name}' AND DATA_QUEUE_LIBRARY = '${this.library}'
-        Fetch first row only`,
+        WHERE DATA_QUEUE_NAME = '${this.name}' AND DATA_QUEUE_LIBRARY = '${this.library}'`,
         'QSYS2',
         'DATA_QUEUE_INFO',
         'VIEW'
@@ -351,8 +350,7 @@ export class Dtaq extends Base {
       }
 
       sql = sql.trim() + ` FROM QSYS2.DATA_QUEUE_INFO
-                WHERE DATA_QUEUE_NAME = '${this.name}' AND DATA_QUEUE_LIBRARY = '${this.library}'
-                Fetch first row only`
+                WHERE DATA_QUEUE_NAME = '${this.name}' AND DATA_QUEUE_LIBRARY = '${this.library}'`;
 
       this.dtaq = await executeSqlIfExists(
         connection,
