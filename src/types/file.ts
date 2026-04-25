@@ -20,7 +20,8 @@ import Base from "./base";
 import { IBMiObject, CommandResult } from '@halcyontech/vscode-ibmi-types';
 import { Components } from "../webviewToolkit";
 import { getInstance } from "../ibmi";
-import { generateDetailTable, getColumns, generateFastTable, FastTableColumn, getProtected, checkTableFunctionExists, checkViewExists, executeSqlIfExists, openTextTemplate } from "../tools";
+import { generateDetailTable, getColumns, generateFastTable, FastTableColumn, getProtected, checkTableFunctionExists, checkViewExists, executeSqlIfExists } from "../tools";
+import { DocumentManager } from "../DocumentManager";
 import { Tools } from '@halcyontech/vscode-ibmi-types/api/Tools';
 import * as vscode from 'vscode';
 import ObjectProvider from '../objectProvider';
@@ -68,7 +69,7 @@ export namespace FileActions {
         from ${library}.${name}`;
     
     // Open the SQL template with the generated statement
-    return await openTextTemplate(sqlStatement,'sql');
+    return await DocumentManager.openTextTemplate(sqlStatement,'sql');
   };
 }
 

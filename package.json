@@ -266,6 +266,16 @@
         "title": "%command.dspobj.title%",
         "category": "IBM i FS",
         "icon": "$(info)"
+      },
+      {
+        "command": "vscode-ibmi-fs.wrkjob",
+        "title": "WRKJOB",
+        "category": "FS Actions"
+      },
+      {
+        "command": "vscode-ibmi-fs.showFsActionsMenu",
+        "title": "Show FS Actions Menu",
+        "category": "FS Actions"
       }
     ],
     "menus": {

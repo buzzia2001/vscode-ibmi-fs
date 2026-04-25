@@ -2,7 +2,7 @@
 import * as vscode from 'vscode';
 import Base from './types/base';
 import { generateError, generatePage } from './webviewToolkit';
-import { openTextTemplate } from './tools';
+import { DocumentManager } from './DocumentManager';
 import path = require('path');
 
 import { Dtaara } from './types/dataArea';
@@ -336,7 +336,7 @@ async function shouldOpenInTextEditor(uri: vscode.Uri): Promise<boolean> {
         if(qrysql.trim()===''){
           vscode.window.showErrorMessage(vscode.l10n.t(`Unable to fetch query definition.`));
         } else {
-          await openTextTemplate(qrysql, 'sql');
+          await DocumentManager.openTextTemplate(qrysql, 'sql');
         }
         return true;
     }
