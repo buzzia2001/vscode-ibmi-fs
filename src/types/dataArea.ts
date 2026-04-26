@@ -295,9 +295,11 @@ export class Dtaara extends Base {
         `select DATA_AREA_VALUE,
           DATA_AREA_TYPE,
           LENGTH,
-          TEXT_DESCRIPTION ${this.dta[0].DATA_AREA_TYPE === '*DEC' ? ', DECIMAL_POSITIONS' : ''}
+          OBJTEXT AS TEXT_DESCRIPTION ${this.dta[0].DATA_AREA_TYPE === '*DEC' ? ', DECIMAL_POSITIONS' : ''}
           from table(QSYS2.DATA_AREA_INFO(DATA_AREA_NAME => '${this.name}',
-            DATA_AREA_LIBRARY => '${this.library}'))`,
+            DATA_AREA_LIBRARY => '${this.library}')),
+          TABLE (QSYS2.OBJECT_STATISTICS(OBJECT_SCHEMA => '${this.library}', 
+            OBJTYPELIST => 'DTAARA', OBJECT_NAME => '${this.name}'))`,
         'QSYS2',
         'DATA_AREA_INFO',
         'VIEW'

@@ -17,7 +17,7 @@ import { MessageQueueActions } from './types/messageQueue';
 import { FileActions } from './types/file';
 import { UserIndexActions } from './types/userIndex';
 import { DspobjActions } from './dspobj';
-import { DocumentManager } from './DocumentManager';
+import { DocumentManager } from './documentManager';
 
 /**
  * Extension activation function

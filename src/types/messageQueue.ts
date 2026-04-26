@@ -289,7 +289,7 @@ export default class Msgq extends Base {
       // Get total count for pagination
       const countRows = await executeSqlIfExists(
         connection,
-        `SELECT COUNT(*) as TOTAL FROM TABLE(QSYS2.MESSAGE_QUEUE_INFO(MESSAGE_QUEUE_NAME => '${this.name}', MESSAGE_QUEUE_LIBRARY => '${this.library}' )) ${whereClause}`,
+        `SELECT COUNT(*) as TOTAL FROM TABLE(QSYS2.MESSAGE_QUEUE_INFO(QUEUE_NAME => '${this.name}', QUEUE_LIBRARY => '${this.library}' )) ${whereClause}`,
         'QSYS2',
         'MESSAGE_QUEUE_INFO',
         'VIEW'
@@ -315,7 +315,7 @@ export default class Msgq extends Base {
           FROM_USER,
           FROM_JOB,
           MESSAGE_SECOND_LEVEL_TEXT
-        FROM TABLE(QSYS2.MESSAGE_QUEUE_INFO(MESSAGE_QUEUE_NAME => '${this.name}', MESSAGE_QUEUE_LIBRARY => '${this.library}' ))
+        FROM TABLE(QSYS2.MESSAGE_QUEUE_INFO(QUEUE_NAME => '${this.name}', QUEUE_LIBRARY => '${this.library}' ))
         ${whereClause}
         ORDER BY MESSAGE_TIMESTAMP DESC
         LIMIT ${this.itemsPerPage} OFFSET ${offset}`,

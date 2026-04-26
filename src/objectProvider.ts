@@ -2,7 +2,7 @@
 import * as vscode from 'vscode';
 import Base from './types/base';
 import { generateError, generatePage } from './webviewToolkit';
-import { DocumentManager } from './DocumentManager';
+import { DocumentManager } from './documentManager';
 import path = require('path');
 
 import { Dtaara } from './types/dataArea';

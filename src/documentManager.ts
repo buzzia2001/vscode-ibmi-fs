@@ -200,7 +200,7 @@ export class DocumentManager {
   }
 
   /**
-   * Open a text template in a new editor
+   * Open a text template in a new editable editor
    * @param content - Content to display
    * @param language - Language ID for syntax highlighting (default: 'plaintext')
    * @returns Promise that resolves to true if successful
@@ -210,7 +210,18 @@ export class DocumentManager {
     language: string = 'plaintext'
   ): Promise<boolean> {
     try {
-      await DocumentManager.show('Untitled', content, language);
+      // Create a new untitled document (editable)
+      const doc = await vscode.workspace.openTextDocument({
+        content: content,
+        language: language
+      });
+      
+      // Show the document in the editor
+      await vscode.window.showTextDocument(doc, {
+        preview: false,
+        preserveFocus: false
+      });
+      
       return true;
     } catch (error) {
       vscode.window.showErrorMessage(`Failed to open text template: ${error}`);
