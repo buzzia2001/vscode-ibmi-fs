@@ -461,30 +461,16 @@ export namespace OutputQueueActions {
   };
 
   /**
-   * Delete a specific spooled file
-   * @param item - The spool entry to delete
+   * Open a spooled file in VS Code editor
+   * @param item - The spool entry to open
    * @returns True if successful, false otherwise
    */
   export const openSpool = async (item: Entry): Promise<boolean> => {
-    const ibmi = getInstance();
-    const connection = ibmi?.getConnection();
-    if (connection) {
-      const cmdrun: CommandResult = await connection.runCommand({
-        command: `QSYS/DLTSPLF FILE(${item.spoolname}) JOB(${item.job}) SPLNBR(${item.nbr})`,
-        environment: `ile`
-      });
-
-      if (cmdrun.code === 0) {
-        vscode.window.showInformationMessage(vscode.l10n.t("Spool deleted."));
-        return true;
-      } else {
-        vscode.window.showErrorMessage(vscode.l10n.t("Unable to delete selected spool:\n{0}", String(cmdrun.stderr)));
-        return false;
-      }
-    } else {
-      vscode.window.showErrorMessage(vscode.l10n.t("Not connected to IBM i"));
-      return false;
-    }
+    return SpoolOperations.openSpool({
+      spoolname: item.spoolname,
+      nbr: item.nbr,
+      job: item.job
+    });
   };
 
   /**
@@ -749,11 +735,12 @@ export default class Outq extends Base {
       { title: vscode.l10n.t("Size (KB)"), width: "1fr", getValue: e => String(e.spoolsiz) },
       {
         title: vscode.l10n.t("Actions"),
-        width: "1fr",
+        width: "1.5fr",
         getValue: e => {
           // Encode spool entry as URL parameter for action handlers
           const arg = encodeURIComponent(JSON.stringify(e));
-          return `<vscode-button appearance="primary" href="action:genPdf?entry=${arg}">${vscode.l10n.t("Download")} ⬇️</vscode-button>
+          return `<vscode-button appearance="primary" href="action:openSpool?entry=${arg}">${vscode.l10n.t("Open")} 📄</vscode-button>
+                <vscode-button appearance="primary" href="action:genPdf?entry=${arg}">${vscode.l10n.t("Download")} ⬇️</vscode-button>
                 <vscode-button appearance="secondary" href="action:delPdf?entry=${arg}">${vscode.l10n.t("Delete")} ❌</vscode-button>`;
         }
       }
@@ -802,6 +789,15 @@ export default class Outq extends Base {
     // Route to appropriate action handler based on action type
     switch (uri.path) {
       // Individual spool file actions
+      case "openSpool":
+        // Open spool file in VS Code editor
+        entryJson = params.get("entry");
+        if (entryJson) {
+          const entry: Entry = JSON.parse(decodeURIComponent(entryJson));
+          await OutputQueueActions.openSpool(entry);
+        }
+        break;
+
       case "genPdf":
         // Generate and download PDF from spool file
         entryJson = params.get("entry");

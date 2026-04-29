@@ -18,6 +18,7 @@ import * as vscode from 'vscode';
 import { CommandResult } from '@halcyontech/vscode-ibmi-types';
 import { getInstance } from './ibmi';
 import { checkTableFunctionExists } from './tools';
+import { posix } from 'path';
 
 /**
  * Interface representing a job identifier
@@ -267,6 +268,62 @@ export namespace SpoolOperations {
     } catch (error) {
       vscode.window.showErrorMessage(
         vscode.l10n.t("Error deleting spool: {0}", String(error))
+      );
+      return false;
+    }
+  };
+
+  /**
+   * Open a spooled file in VS Code editor
+   * Copies the spool to a temporary stream file and opens it in the editor
+   * @param spoolId - Spooled file identifier
+   * @returns True if successful, false otherwise
+   */
+  export const openSpool = async (
+    spoolId: SpoolIdentifier,
+  ): Promise<boolean> => {
+    const ibmi = getInstance();
+    const connection = ibmi?.getConnection();
+    
+    if (!connection) {
+      vscode.window.showErrorMessage(vscode.l10n.t("Not connected to IBM i"));
+      return false;
+    }
+
+    try {
+      // Create a temporary directory and copy the spool file to it
+      return connection.withTempDirectory(async (tempDir) : Promise<boolean> => {
+        // Generate temporary file path for the spool content
+        const tempSourcePath = posix.join(tempDir, `spool.txt`);
+
+        // Execute CPYSPLF command to copy spool to stream file
+        const result = await connection.runCommand({
+          command: `QSYS/CPYSPLF FILE(${spoolId.spoolname}) JOB(${spoolId.job}) SPLNBR(${spoolId.nbr}) TOFILE(*TOSTMF) TOSTMF('${tempSourcePath}')
+            CPY OBJ('${tempSourcePath}') TOOBJ('${tempSourcePath}') TOCCSID(*PCASCII) DTAFMT(*TEXT) REPLACE(*YES)`,
+          environment: 'ile'
+        });
+
+        if(result.code===0){
+          // Create URI for the temporary file and open it in VS Code as readonly
+          const uri = vscode.Uri.parse(tempSourcePath).with({
+            scheme: `streamfile`
+          });
+          await vscode.commands.executeCommand(`vscode.open`, uri, {
+            preview: false,
+            preserveFocus: false
+          });
+          
+          return true;
+        } else {
+          vscode.window.showErrorMessage(
+            vscode.l10n.t("Error opening spool: {0}", String(result.stderr))
+          );
+          return false;
+        }
+      });
+    } catch (error) {
+      vscode.window.showErrorMessage(
+        vscode.l10n.t("Error opening spool: {0}", String(error))
       );
       return false;
     }
