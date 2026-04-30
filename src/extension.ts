@@ -17,6 +17,7 @@ import { MessageQueueActions } from './types/messageQueue';
 import { FileActions } from './types/file';
 import { UserIndexActions } from './types/userIndex';
 import { DspobjActions } from './dspobj';
+import { WrksplfActions } from './views/wrksplf';
 import { DocumentManager } from './documentManager';
 
 /**
@@ -53,6 +54,7 @@ export async function activate(context: vscode.ExtensionContext) {
   FileActions.register(context);
   UserIndexActions.register(context);
   DspobjActions.register(context);
+  WrksplfActions.register(context);
 
   // Register refresh command
   context.subscriptions.push(
@@ -219,15 +221,18 @@ export async function activate(context: vscode.ExtensionContext) {
       const action = await vscode.window.showQuickPick(
         [
           { label: 'WRKJOB', description: 'Work with Job' },
-          { label: 'DSPMSG QSYSOPR', description: 'Display System Operator Messages' },
-          { label: 'DSPOBJ', description: 'Display Object Information' },
-          { label: 'DSPOBJ Detailed', description: 'Display Object Information (single input)' }
+          { label: '$(output-view-icon) WRKSPLF', description: 'Work with Spooled Files' },
+          { label: '$(chat-editor-label-icon) DSPMSG QSYSOPR', description: 'Display System Operator Messages' },
+          { label: '$(extensions-info-message) DSPOBJ', description: 'Display Object Information' },
+          { label: '$(search-view-icon) DSPOBJ Detailed', description: 'Display Object Information (single input)' }
         ],
         { placeHolder: 'Select an FS action' }
       );
 
       if (action?.label === 'WRKJOB') {
         vscode.commands.executeCommand('vscode-ibmi-fs.wrkjob');
+      } else if (action?.label === 'WRKSPLF') {
+        vscode.commands.executeCommand('vscode-ibmi-fs.wrksplf');
       } else if (action?.label === 'DSPMSG QSYSOPR') {
         vscode.commands.executeCommand('vscode-ibmi-fs.dspmsgQsysopr');
       } else if (action?.label === 'DSPOBJ') {
