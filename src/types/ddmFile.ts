@@ -22,7 +22,7 @@ import {
   generateDetailTable,
   getQSYSObjectPath,
 } from "../tools";
-import Base from "../base";
+import Base from "./base";
 import { getInstance } from "../ibmi";
 import path = require("path");
 

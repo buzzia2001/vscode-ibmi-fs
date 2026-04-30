@@ -1,6 +1,6 @@
 
 import * as vscode from 'vscode';
-import Base from './base';
+import Base from './types/base';
 import { generateError, generatePage } from './webviewToolkit';
 import { DocumentManager } from './documentManager';
 import path = require('path');
@@ -38,7 +38,7 @@ export default class ObjectProvider implements vscode.CustomEditorProvider<Base>
   public readonly onDidChangeCustomDocument = this._onDidChangeCustomDocument.event;
   
   // Map to track open documents and their webview panels
-  private static readonly _documentPanels = new Map<string, { document: Base, panel: vscode.WebviewPanel }>();
+  private static readonly _documentPanels = new Map<string, { document: Base, panel: vscode.WebviewPanel, refreshTimer?: NodeJS.Timeout }>();
   
   /**
    * Get the document and panel for a given URI
@@ -168,6 +168,22 @@ export default class ObjectProvider implements vscode.CustomEditorProvider<Base>
     // Register the document and panel
     ObjectProvider._documentPanels.set(document.uri.toString(), { document, panel: webviewPanel });
     
+    // Setup auto-refresh for Message Queues
+    if (document instanceof Msgq && (document as Msgq).autoRefresh) {
+      const refreshTimer = setInterval(async () => {
+        // Check if panel is still visible and active
+        if (webviewPanel.visible) {
+          await ObjectProvider.refreshDocument(document.uri);
+        }
+      }, (document as Msgq).autoRefreshInterval);
+      
+      // Store the timer in the map
+      const entry = ObjectProvider._documentPanels.get(document.uri.toString());
+      if (entry) {
+        entry.refreshTimer = refreshTimer;
+      }
+    }
+    
     // Update context when panel becomes active
     webviewPanel.onDidChangeViewState(e => {
       if (e.webviewPanel.active) {
@@ -182,6 +198,11 @@ export default class ObjectProvider implements vscode.CustomEditorProvider<Base>
     
     // Clean up when panel is disposed
     webviewPanel.onDidDispose(() => {
+      const entry = ObjectProvider._documentPanels.get(document.uri.toString());
+      // Clear auto-refresh timer if exists
+      if (entry?.refreshTimer) {
+        clearInterval(entry.refreshTimer);
+      }
       ObjectProvider._documentPanels.delete(document.uri.toString());
       // Clear the context when panel is closed
       vscode.commands.executeCommand('setContext', 'ibmiFileType', undefined);

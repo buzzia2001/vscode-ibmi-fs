@@ -13,7 +13,7 @@
  * @module dataarea
  */
 
-import Base from "../base";
+import Base from "./base";
 import { IBMiObject, CommandResult } from '@halcyontech/vscode-ibmi-types';
 import { Components } from "../webviewToolkit";
 import { getInstance } from "../ibmi";

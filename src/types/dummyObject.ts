@@ -11,7 +11,7 @@
  * @module dummyobject
  */
 
-import Base from "../base";
+import Base from "./base";
 import { getInstance } from "../ibmi";
 import { getColumns, generateDetailTable } from "../tools";
 import * as vscode from 'vscode';

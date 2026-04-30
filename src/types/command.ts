@@ -18,7 +18,7 @@
  * @module command
  */
 
-import Base from "../base";
+import Base from "./base";
 import { getInstance } from "../ibmi";
 import { getColumns, generateDetailTable, checkViewExists, executeSqlIfExists } from "../tools";
 import * as vscode from 'vscode';

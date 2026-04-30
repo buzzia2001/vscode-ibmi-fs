@@ -16,7 +16,7 @@
  * @module messagequeue
  */
 
-import Base from "../base";
+import Base from "./base";
 import { IBMiObject, CommandResult } from '@halcyontech/vscode-ibmi-types';
 import { getInstance } from "../ibmi";
 import { Tools } from '@halcyontech/vscode-ibmi-types/api/Tools';
@@ -254,6 +254,10 @@ export default class Msgq extends Base {
   selectClause: string | undefined;
   /** Array of message entries */
   private _entries: Entry[] = [];
+  /** Flag to enable auto-refresh every 30 seconds */
+  public autoRefresh: boolean = true;
+  /** Auto-refresh interval in milliseconds (30 seconds) */
+  public autoRefreshInterval: number = 30000;
 
   /**
    * Fetch message queue data

@@ -22,7 +22,7 @@ import { basename } from "path";
 import * as vscode from "vscode";
 import { FastTableColumn, IBMI_OBJECT_NAME, generateDetailTable, generateFastTable, getProtected, getQSYSObjectPath, checkViewExists, checkTableFunctionExists, executeSqlIfExists } from "../tools";
 import { Components } from "../webviewToolkit";
-import Base from "../base";
+import Base from "./base";
 import { getInstance, getVSCodeTools } from "../ibmi";
 import { Tools } from "@halcyontech/vscode-ibmi-types/api/Tools";
 import path = require("path");
