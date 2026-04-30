@@ -27,6 +27,10 @@
   "command.sendToMessageQueue.title": "메시지를 메시지 큐로 전송",
   "command.uploadSavf.title": "저장 파일 업로드",
   "command.dspobj.title": "오브젝트 정보",
+  "command.dspmsgQsysopr.title": "QSYSOPR 메시지 표시",
+  "command.dspobjDetailed.title": "오브젝트 정보 표시 (상세)",
+  "command.refreshObject.title": "오브젝트 새로 고침",
+  "command.showObjectActions.title": "오브젝트 작업",
   "description": "IBM i 용 파일 시스템 공급자 QSYS",
   "displayName": "IBM i FileSystem"
 }

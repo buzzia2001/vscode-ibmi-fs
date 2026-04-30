@@ -140,8 +140,7 @@ export namespace SaveFileActions {
         connection,
         `SELECT SAVE_COMMAND
           FROM QSYS2.SAVE_FILE_INFO
-          WHERE SAVE_FILE_LIBRARY = '${target.library}' AND SAVE_FILE = '${target.name}'
-          FETCH FIRST ROW ONLY`,
+          WHERE SAVE_FILE_LIBRARY = '${target.library}' AND SAVE_FILE = '${target.name}'`,
         'QSYS2',
         'SAVE_FILE_INFO',
         'VIEW'
@@ -264,8 +263,7 @@ export namespace SaveFileActions {
         connection,
         `SELECT SAVE_COMMAND
           FROM QSYS2.SAVE_FILE_INFO
-          WHERE SAVE_FILE_LIBRARY = '${target.library}' AND SAVE_FILE = '${target.name}'
-          FETCH FIRST ROW ONLY`,
+          WHERE SAVE_FILE_LIBRARY = '${target.library}' AND SAVE_FILE = '${target.name}'`,
         'QSYS2',
         'SAVE_FILE_INFO',
         'VIEW'
@@ -437,8 +435,7 @@ export namespace SaveFileActions {
         connection,
         `SELECT SAVE_COMMAND
           FROM QSYS2.SAVE_FILE_INFO
-          WHERE SAVE_FILE_LIBRARY = '${target.library}' AND SAVE_FILE = '${target.name}'
-          FETCH FIRST ROW ONLY`,
+          WHERE SAVE_FILE_LIBRARY = '${target.library}' AND SAVE_FILE = '${target.name}'`,
         'QSYS2',
         'SAVE_FILE_INFO',
         'VIEW'
@@ -484,9 +481,8 @@ export namespace SaveFileActions {
           if (saveCmd !== "SAV") {
             const libResult = await connection.runSQL(
               `SELECT LIBRARY_NAME 
-        FROM QSYS2.SAVE_FILE_INFO WHERE
-        SAVE_FILE_LIBRARY = '${target.library}' AND SAVE_FILE = '${target.name}'
-        Fetch first row only`,
+                FROM QSYS2.SAVE_FILE_INFO WHERE
+                SAVE_FILE_LIBRARY = '${target.library}' AND SAVE_FILE = '${target.name}'`,
             );
             fromlib = libResult[0].LIBRARY_NAME
               ? libResult[0].LIBRARY_NAME.toString()
@@ -847,8 +843,7 @@ export namespace SaveFileActions {
         connection,
         `SELECT SAVE_COMMAND
           FROM QSYS2.SAVE_FILE_INFO
-          WHERE SAVE_FILE_LIBRARY = '${target.library}' AND SAVE_FILE = '${target.name}'
-          FETCH FIRST ROW ONLY`,
+          WHERE SAVE_FILE_LIBRARY = '${target.library}' AND SAVE_FILE = '${target.name}'`,
         'QSYS2',
         'SAVE_FILE_INFO',
         'VIEW'
@@ -1277,8 +1272,7 @@ export class SaveFile extends Base {
           SAVE_FILE,
           SAVE_COMMAND
           FROM QSYS2.SAVE_FILE_INFO WHERE
-          SAVE_FILE_LIBRARY = '${this.library}' AND SAVE_FILE = '${this.name}'
-          Fetch first row only`,
+          SAVE_FILE_LIBRARY = '${this.library}' AND SAVE_FILE = '${this.name}'`,
         'QSYS2',
         'SAVE_FILE_INFO',
         'VIEW'

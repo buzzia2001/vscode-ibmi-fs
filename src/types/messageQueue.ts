@@ -254,6 +254,10 @@ export default class Msgq extends Base {
   selectClause: string | undefined;
   /** Array of message entries */
   private _entries: Entry[] = [];
+  /** Flag to enable auto-refresh every 30 seconds */
+  public autoRefresh: boolean = true;
+  /** Auto-refresh interval in milliseconds (30 seconds) */
+  public autoRefreshInterval: number = 30000;
 
   /**
    * Fetch message queue data
@@ -272,12 +276,12 @@ export default class Msgq extends Base {
     const connection = ibmi?.getConnection();
     if (connection) {
       // Build WHERE clause with base conditions
-      let whereClause = `MESSAGE_QUEUE_LIBRARY = '${this.library}' AND MESSAGE_QUEUE_NAME = '${this.name}'`;
+      let whereClause = ``;
 
       // Add search filter if present
       if (this.searchTerm && this.searchTerm.trim() !== '' && this.searchTerm.trim() !== '-') {
         const searchPattern = `%${this.searchTerm.trim().toUpperCase()}%`;
-        whereClause += ` AND (
+        whereClause += ` WHERE (
           UPPER(MESSAGE_ID) LIKE '${searchPattern}' OR
           UPPER(MESSAGE_TEXT) LIKE '${searchPattern}' OR
           UPPER(MESSAGE_SECOND_LEVEL_TEXT) LIKE '${searchPattern}' OR
@@ -289,7 +293,7 @@ export default class Msgq extends Base {
       // Get total count for pagination
       const countRows = await executeSqlIfExists(
         connection,
-        `SELECT COUNT(*) as TOTAL FROM QSYS2.MESSAGE_QUEUE_INFO WHERE ${whereClause}`,
+        `SELECT COUNT(*) as TOTAL FROM TABLE(QSYS2.MESSAGE_QUEUE_INFO(QUEUE_NAME => '${this.name}', QUEUE_LIBRARY => '${this.library}' )) ${whereClause}`,
         'QSYS2',
         'MESSAGE_QUEUE_INFO',
         'VIEW'
@@ -315,9 +319,9 @@ export default class Msgq extends Base {
           FROM_USER,
           FROM_JOB,
           MESSAGE_SECOND_LEVEL_TEXT
-        FROM QSYS2.MESSAGE_QUEUE_INFO
-        WHERE ${whereClause}
-        ORDER BY MESSAGE_TIMESTAMP DESC
+        FROM TABLE(QSYS2.MESSAGE_QUEUE_INFO(QUEUE_NAME => '${this.name}', QUEUE_LIBRARY => '${this.library}' )) x
+        ${whereClause}
+        ORDER BY x.MESSAGE_TIMESTAMP DESC
         LIMIT ${this.itemsPerPage} OFFSET ${offset}`,
         'QSYS2',
         'MESSAGE_QUEUE_INFO',

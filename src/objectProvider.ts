@@ -2,7 +2,7 @@
 import * as vscode from 'vscode';
 import Base from './types/base';
 import { generateError, generatePage } from './webviewToolkit';
-import { openSqlTemplate, openTextTemplate } from './tools';
+import { DocumentManager } from './documentManager';
 import path = require('path');
 
 import { Dtaara } from './types/dataArea';
@@ -38,7 +38,7 @@ export default class ObjectProvider implements vscode.CustomEditorProvider<Base>
   public readonly onDidChangeCustomDocument = this._onDidChangeCustomDocument.event;
   
   // Map to track open documents and their webview panels
-  private static readonly _documentPanels = new Map<string, { document: Base, panel: vscode.WebviewPanel }>();
+  private static readonly _documentPanels = new Map<string, { document: Base, panel: vscode.WebviewPanel, refreshTimer?: NodeJS.Timeout }>();
   
   /**
    * Get the document and panel for a given URI
@@ -56,7 +56,19 @@ export default class ObjectProvider implements vscode.CustomEditorProvider<Base>
   public static async refreshDocument(uri: vscode.Uri): Promise<void> {
     const entry = ObjectProvider._documentPanels.get(uri.toString());
     if (entry) {
+      // First, tell the webview to save its current state with the restore flag
+      // This must happen BEFORE we update the HTML
+      await entry.panel.webview.postMessage({
+        command: 'saveStateForRestore'
+      });
+      
+      // Give the webview time to process the message and save state
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Now fetch new data
       await entry.document.fetch();
+      
+      // Update HTML - the state is already saved with isSearchRestore flag
       entry.panel.webview.html = generatePage(entry.document.generateHTML());
     }
   }
@@ -156,6 +168,22 @@ export default class ObjectProvider implements vscode.CustomEditorProvider<Base>
     // Register the document and panel
     ObjectProvider._documentPanels.set(document.uri.toString(), { document, panel: webviewPanel });
     
+    // Setup auto-refresh for Message Queues
+    if (document instanceof Msgq && (document as Msgq).autoRefresh) {
+      const refreshTimer = setInterval(async () => {
+        // Check if panel is still visible and active
+        if (webviewPanel.visible) {
+          await ObjectProvider.refreshDocument(document.uri);
+        }
+      }, (document as Msgq).autoRefreshInterval);
+      
+      // Store the timer in the map
+      const entry = ObjectProvider._documentPanels.get(document.uri.toString());
+      if (entry) {
+        entry.refreshTimer = refreshTimer;
+      }
+    }
+    
     // Update context when panel becomes active
     webviewPanel.onDidChangeViewState(e => {
       if (e.webviewPanel.active) {
@@ -170,6 +198,11 @@ export default class ObjectProvider implements vscode.CustomEditorProvider<Base>
     
     // Clean up when panel is disposed
     webviewPanel.onDidDispose(() => {
+      const entry = ObjectProvider._documentPanels.get(document.uri.toString());
+      // Clear auto-refresh timer if exists
+      if (entry?.refreshTimer) {
+        clearInterval(entry.refreshTimer);
+      }
       ObjectProvider._documentPanels.delete(document.uri.toString());
       // Clear the context when panel is closed
       vscode.commands.executeCommand('setContext', 'ibmiFileType', undefined);
@@ -212,7 +245,7 @@ export default class ObjectProvider implements vscode.CustomEditorProvider<Base>
           // Re-fetch only searchable data (avoids reloading all tabs in multi-tab documents)
           await document.fetchSearchData();
           
-          // Re-render the view
+          // Re-render the view (state already saved by search/pagination script in tools.ts)
           webviewPanel.webview.html = generatePage(document.generateHTML());
           return;
         }
@@ -229,6 +262,11 @@ export default class ObjectProvider implements vscode.CustomEditorProvider<Base>
         }
 
         if (actionResult.rerender) {
+          // For rerender after actions, we need to save state first
+          await webviewPanel.webview.postMessage({
+            command: 'saveStateForRestore'
+          });
+          await new Promise(resolve => setTimeout(resolve, 100));
           webviewPanel.webview.html = generatePage(document.generateHTML());
         }
       });
@@ -336,7 +374,7 @@ async function shouldOpenInTextEditor(uri: vscode.Uri): Promise<boolean> {
         if(qrysql.trim()===''){
           vscode.window.showErrorMessage(vscode.l10n.t(`Unable to fetch query definition.`));
         } else {
-          await openSqlTemplate(qrysql);
+          await DocumentManager.openTextTemplate(qrysql, 'sql');
         }
         return true;
     }

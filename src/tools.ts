@@ -1017,40 +1017,14 @@ export function generateFastTable<T>(options: FastTableOptions<T>): string {
 }
 
 /**
- * Open a new untitled SQL document with pre-written SQL statement
- * This is a utility function that can be called from any component
- * @param sqlStatement - The SQL statement to pre-populate in the new document
- * @returns Promise<boolean> - True if successful, false otherwise
- */
-export async function openSqlTemplate(sqlStatement: string): Promise<boolean> {
-  try {
-    // Create a new untitled document with SQL language
-    const document = await vscode.workspace.openTextDocument({
-      language: 'sql',
-      content: sqlStatement
-    });
-    
-    // Show the document in a new editor
-    await vscode.window.showTextDocument(document, {
-      preview: false,
-      viewColumn: vscode.ViewColumn.Active
-    });
-
-    return true;
-  } catch (error) {
-    vscode.window.showErrorMessage(`Failed to open SQL template: ${error}`);
-    return false;
-  }
-}
-
-/**
  * Open a new untitled document with pre-written content
  * Similar to openSqlTemplate but for any language/content
  * @param content - The content to pre-populate in the new document
  * @param language - The language ID for syntax highlighting (default: 'plaintext')
+ * @param readonly - If true, opens the document in preview mode (temporary tab that can be closed without save prompt, simulating read-only behavior)
  * @returns Promise<boolean> - True if successful, false otherwise
  */
-export async function openTextTemplate(content: string, language: string = 'plaintext'): Promise<boolean> {
+export async function openTextTemplate(content: string, language: string = 'plaintext', readonly: boolean = false): Promise<boolean> {
   try {
     // Create a new untitled document with specified language
     const document = await vscode.workspace.openTextDocument({
@@ -1060,7 +1034,7 @@ export async function openTextTemplate(content: string, language: string = 'plai
     
     // Show the document in a new editor
     await vscode.window.showTextDocument(document, {
-      preview: false,
+      preview: readonly,
       viewColumn: vscode.ViewColumn.Active
     });
 

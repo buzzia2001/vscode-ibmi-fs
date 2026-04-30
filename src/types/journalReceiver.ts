@@ -90,8 +90,7 @@ export default class Jrnrcv extends Base {
           FILTER_PROGRAM_ARRAY,
           FILTER_PROGRAM_JSON
         FROM QSYS2.JOURNAL_RECEIVER_INFO
-        where JOURNAL_RECEIVER_LIBRARY= '${this.library}' and JOURNAL_RECEIVER_NAME = '${this.name}'
-          Fetch first row only`,
+        where JOURNAL_RECEIVER_LIBRARY= '${this.library}' and JOURNAL_RECEIVER_NAME = '${this.name}'`,
         'QSYS2',
         'JOURNAL_RECEIVER_INFO',
         'VIEW'

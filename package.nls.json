@@ -27,6 +27,10 @@
   "command.sendToMessageQueue.title": "Send Message to Message Queue",
   "command.uploadSavf.title": "Upload Save File",
   "command.dspobj.title": "Additional Information",
+  "command.dspmsgQsysopr.title": "Display QSYSOPR Messages",
+  "command.dspobjDetailed.title": "Display Object Information (Detailed)",
+  "command.refreshObject.title": "Refresh Object",
+  "command.showObjectActions.title": "Object Actions",
   "description": "File system provider for IBM i QSYS",
   "displayName": "IBM i FileSystem"
 }

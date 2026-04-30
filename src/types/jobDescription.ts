@@ -51,8 +51,7 @@ export default class Jobd extends Base {
           LOG_CL_PROGRAM_COMMANDS, DEVICE_RECOVERY_ACTION, TIME_SLICE_END_POOL, ALLOW_MULTIPLE_THREADS, WORKLOAD_GROUP, ASPGRP,
           DDM_CONVERSATION
           FROM QSYS2.JOB_DESCRIPTION_INFO
-          WHERE JOB_DESCRIPTION = '${this.name}' AND JOB_DESCRIPTION_LIBRARY = '${this.library}'
-          Fetch first row only`,
+          WHERE JOB_DESCRIPTION = '${this.name}' AND JOB_DESCRIPTION_LIBRARY = '${this.library}'`,
         'QSYS2',
         'JOB_DESCRIPTION_INFO',
         'VIEW'

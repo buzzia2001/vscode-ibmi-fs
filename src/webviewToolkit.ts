@@ -112,26 +112,35 @@ const footer = /*html*/`
         // Get the current state from vscode
         const state = vscode.getState() || {};
         
+        console.log('[Tab Restore] Current state:', JSON.stringify(state));
+        
         // Check if this is a search/pagination restore (flag set by search/pagination events)
         const isSearchRestore = state.isSearchRestore === true;
+        
+        console.log('[Tab Restore] isSearchRestore:', isSearchRestore);
         
         if (isSearchRestore) {
           // Restore previously active tab only if coming from search/pagination
           const savedIndex = state.activeTabIndex;
+          console.log('[Tab Restore] Saved tab index:', savedIndex);
+          
           if (savedIndex !== undefined && savedIndex !== null) {
             const index = parseInt(savedIndex);
             if (!isNaN(index) && index >= 0) {
+              console.log('[Tab Restore] Restoring tab to index:', index);
               // Set the selected index immediately (the attribute is available before rendering)
               tabs.setAttribute('selected-index', index.toString());
               
               // Also set it after a delay as a fallback to ensure it's applied
               setTimeout(() => {
                 tabs.setAttribute('selected-index', index.toString());
+                console.log('[Tab Restore] Tab restored (delayed)');
               }, 100);
             }
           }
           // DON'T clear the flag here - it will be cleared after scroll is done
         } else {
+          console.log('[Tab Restore] Not a restore operation, clearing saved tab');
           // New document opened, clear saved tab to start from first tab
           state.activeTabIndex = undefined;
           vscode.setState(state);
@@ -140,12 +149,16 @@ const footer = /*html*/`
         // Save active tab when it changes (for future search/pagination)
         tabs.addEventListener('vsc-select', (event) => {
           const selectedIndex = event.detail.selectedIndex;
+          console.log('[Tab Change] Tab changed to index:', selectedIndex);
           if (selectedIndex !== undefined && selectedIndex !== null) {
             const currentState = vscode.getState() || {};
             currentState.activeTabIndex = selectedIndex;
             vscode.setState(currentState);
+            console.log('[Tab Change] Saved tab index to state:', selectedIndex);
           }
         });
+      } else {
+        console.log('[Tab Restore] No vscode-tabs element found');
       }
     })();
 
@@ -171,7 +184,31 @@ const footer = /*html*/`
     })();
 
     window.addEventListener("message", (event) => {
-      // Handle messages from extension
+      const message = event.data;
+      
+      console.log('[Message Received]:', JSON.stringify(message));
+      
+      // Handle saveStateForRestore command - save current tab and set restore flag
+      if (message.command === 'saveStateForRestore') {
+        console.log('[saveStateForRestore] Saving current state');
+        const state = vscode.getState() || {};
+        state.isSearchRestore = true;
+        
+        // Save the current active tab index
+        const tabs = document.querySelector('vscode-tabs');
+        if (tabs) {
+          const currentTabIndex = tabs.getAttribute('selected-index');
+          console.log('[saveStateForRestore] Current tab index:', currentTabIndex);
+          if (currentTabIndex !== null) {
+            state.activeTabIndex = parseInt(currentTabIndex);
+          }
+        } else {
+          console.log('[saveStateForRestore] No vscode-tabs element found');
+        }
+        
+        vscode.setState(state);
+        console.log('[saveStateForRestore] State saved:', JSON.stringify(state));
+      }
     });
   </script>
 `;

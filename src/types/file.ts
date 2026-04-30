@@ -20,7 +20,8 @@ import Base from "./base";
 import { IBMiObject, CommandResult } from '@halcyontech/vscode-ibmi-types';
 import { Components } from "../webviewToolkit";
 import { getInstance } from "../ibmi";
-import { generateDetailTable, getColumns, generateFastTable, FastTableColumn, getProtected, openSqlTemplate, checkTableFunctionExists, checkViewExists, executeSqlIfExists } from "../tools";
+import { generateDetailTable, getColumns, generateFastTable, FastTableColumn, getProtected, checkTableFunctionExists, checkViewExists, executeSqlIfExists } from "../tools";
+import { DocumentManager } from "../documentManager";
 import { Tools } from '@halcyontech/vscode-ibmi-types/api/Tools';
 import * as vscode from 'vscode';
 import ObjectProvider from '../objectProvider';
@@ -68,7 +69,7 @@ export namespace FileActions {
         from ${library}.${name}`;
     
     // Open the SQL template with the generated statement
-    return await openSqlTemplate(sqlStatement);
+    return await DocumentManager.openTextTemplate(sqlStatement,'sql');
   };
 }
 
@@ -279,8 +280,7 @@ export default class File extends Base {
                   QSYS2.OBJECT_STATISTICS('${this.library}', 'FILE', '${this.name}')
               ) X
           WHERE SYSTEM_TABLE_SCHEMA = '${this.library}'
-                AND SYSTEM_TABLE_NAME = '${this.name}'
-          Fetch first row only`,
+                AND SYSTEM_TABLE_NAME = '${this.name}'`,
         'QSYS2',
         'SYSTABLES',
         'VIEW'
@@ -382,8 +382,7 @@ export default class File extends Base {
             END IS_DELETABLE
           FROM QSYS2.SYSVIEWS
           WHERE SYSTEM_VIEW_SCHEMA = '${this.library}'
-                    AND SYSTEM_VIEW_NAME = '${this.name}'
-          Fetch first row only`,
+                    AND SYSTEM_VIEW_NAME = '${this.name}'`,
         'QSYS2',
         'SYSVIEWS',
         'VIEW'
@@ -438,8 +437,7 @@ export default class File extends Base {
           TO_CHAR(LAST_RESTORE_TIMESTAMP, 'yyyy-mm-dd HH24:mi') AS LAST_RESTORE_TIMESTAMP
         FROM QSYS2.SYSTABLESTAT
           WHERE SYSTEM_TABLE_SCHEMA = '${this.library}'
-                AND SYSTEM_TABLE_NAME = '${this.name}'
-          Fetch first row only`,
+                AND SYSTEM_TABLE_NAME = '${this.name}'`,
         'QSYS2',
         'SYSTABLESTAT',
         'VIEW'
@@ -576,8 +574,7 @@ export default class File extends Base {
                 QSYS2.OBJECT_STATISTICS('${this.library}', 'FILE', '${this.name}')
             ) X
           WHERE SYSTEM_INDEX_SCHEMA = '${this.library}'
-                AND SYSTEM_INDEX_NAME = '${this.name}'
-          Fetch first row only`,
+                AND SYSTEM_INDEX_NAME = '${this.name}'`,
         'QSYS2',
         'SYSINDEXES',
         'VIEW'
@@ -639,8 +636,7 @@ export default class File extends Base {
             trim(SYSTEM_TABLE_SCHEMA) concat '/' concat trim(SYSTEM_TABLE_NAME) concat ', ' concat trim(SYSTEM_TABLE_MEMBER) as SYSTEM_TABLE_MEMBER
           FROM QSYS2.SYSINDEXSTAT
           WHERE SYSTEM_INDEX_SCHEMA = '${this.library}'
-                AND SYSTEM_INDEX_NAME = '${this.name}'
-          Fetch first row only`,
+                AND SYSTEM_INDEX_NAME = '${this.name}'`,
         'QSYS2',
         'SYSINDEXSTAT',
         'VIEW'

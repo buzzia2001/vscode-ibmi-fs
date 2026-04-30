@@ -28,6 +28,7 @@ import Base from "./base";
 import { getInstance } from '../ibmi';
 import { getColumns, generateDetailTable, FastTableColumn, generateFastTable, getProtected, checkViewExists, checkTableFunctionExists, executeSqlIfExists } from "../tools";
 import ObjectProvider from '../objectProvider';
+import { JobOperations } from '../commonOperations';
 
 export namespace SubsystemActions {
   /**
@@ -223,33 +224,7 @@ export namespace SubsystemActions {
    * @returns True if successful, false otherwise
    */
   export const endJob = async (item: Job): Promise<boolean> => {
-    // Show confirmation dialog to prevent accidental termination
-    const ibmi = getInstance();
-    const connection = ibmi?.getConnection();
-    if (connection) {
-      if (await vscode.window.showWarningMessage(vscode.l10n.t("Are you sure you want to end job {0} ?", item.job), { modal: true }, vscode.l10n.t("End job"))) {
-
-        // Execute ENDJOB command on IBM i
-        const cmdrun: CommandResult = await connection.runCommand({
-          command: `QSYS/ENDJOB JOB(${item.job}) OPTION(*IMMED)`,
-          environment: `ile`
-        });
-
-        // Check command execution result
-        if (cmdrun.code === 0) {
-          vscode.window.showInformationMessage(vscode.l10n.t("Job ended."));
-          return true;
-        } else {
-          vscode.window.showErrorMessage(vscode.l10n.t("Unable to end selected job:\n{0}", String(cmdrun.stderr)));
-          return false;
-        }
-      } else {
-        return false;
-      }
-    } else {
-      vscode.window.showErrorMessage(vscode.l10n.t("Not connected to IBM i"));
-      return false;    
-    }
+    return JobOperations.endJob({ job: item.job }, '*IMMED');
   };
 }
 
@@ -444,8 +419,7 @@ export class Sbsd extends Base {
             IASP_NAME
           FROM QSYS2.SUBSYSTEM_INFO
           WHERE SUBSYSTEM_DESCRIPTION = '${this.name}'
-                AND SUBSYSTEM_DESCRIPTION_LIBRARY = '${this.library}'
-          Fetch first row only`,
+                AND SUBSYSTEM_DESCRIPTION_LIBRARY = '${this.library}'`,
         'QSYS2',
         'SUBSYSTEM_INFO',
         'VIEW'

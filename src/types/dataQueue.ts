@@ -286,10 +286,8 @@ export class Dtaq extends Base {
    * Fetch data queue information and entries
    */
   async fetch() {
-    await Promise.all([
-      this.fetchInfo(),
-      this.fetchEntries()
-    ])
+    await this.fetchInfo();
+    await this.fetchEntries();
   }
 
   /**
@@ -306,19 +304,21 @@ export class Dtaq extends Base {
       // First query to get data queue type
       this.dtaq = await executeSqlIfExists(
         connection,
-        `SELECT DATA_QUEUE_TYPE
-        FROM QSYS2.DATA_QUEUE_INFO
-        WHERE DATA_QUEUE_NAME = '${this.name}' AND DATA_QUEUE_LIBRARY = '${this.library}'
-        Fetch first row only`,
-        'QSYS2',
-        'DATA_QUEUE_INFO',
-        'VIEW'
+        `SELECT DATA_QUEUE_TYPE, 
+          SEQUENCE
+          FROM QSYS2.DATA_QUEUE_INFO
+          WHERE DATA_QUEUE_NAME = '${this.name}' AND DATA_QUEUE_LIBRARY = '${this.library}'`,
+          'QSYS2',
+          'DATA_QUEUE_INFO',
+          'VIEW'
       );
 
       if (this.dtaq === null) {
         vscode.window.showErrorMessage(vscode.l10n.t("SQL {0} {1}/{2} not found. Please check your IBM i system.", "VIEW", "QSYS2", "DATA_QUEUE_INFO"));
         return;
       }
+
+      this._keyed=this.dtaq[0].SEQUENCE === 'KEYED';
 
       // Build SQL based on data queue type (DDM vs standard)
       if (this.dtaq[0].DATA_QUEUE_TYPE === 'DDM') {
@@ -351,8 +351,7 @@ export class Dtaq extends Base {
       }
 
       sql = sql.trim() + ` FROM QSYS2.DATA_QUEUE_INFO
-                WHERE DATA_QUEUE_NAME = '${this.name}' AND DATA_QUEUE_LIBRARY = '${this.library}'
-                Fetch first row only`
+                WHERE DATA_QUEUE_NAME = '${this.name}' AND DATA_QUEUE_LIBRARY = '${this.library}'`;
 
       this.dtaq = await executeSqlIfExists(
         connection,

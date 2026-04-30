@@ -266,6 +266,40 @@
         "title": "%command.dspobj.title%",
         "category": "IBM i FS",
         "icon": "$(info)"
+      },
+      {
+        "command": "vscode-ibmi-fs.wrkjob",
+        "title": "WRKJOB",
+        "category": "FS Quick Start"
+      },
+      {
+        "command": "vscode-ibmi-fs.showFsActionsMenu",
+        "title": "Show FS Quick Start Menu",
+        "category": "FS Quick Start"
+      },
+      {
+        "command": "vscode-ibmi-fs.dspmsgQsysopr",
+        "title": "%command.dspmsgQsysopr.title%",
+        "category": "FS Quick Start",
+        "icon": "$(mail)"
+      },
+      {
+        "command": "vscode-ibmi-fs.dspobjDetailed",
+        "title": "%command.dspobjDetailed.title%",
+        "category": "FS Quick Start",
+        "icon": "$(info)"
+      },
+      {
+        "command": "vscode-ibmi-fs.refreshObject",
+        "title": "%command.refreshObject.title%",
+        "category": "IBM i FS",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "vscode-ibmi-fs.showObjectActions",
+        "title": "%command.showObjectActions.title%",
+        "category": "IBM i FS",
+        "icon": "$(menu)"
       }
     ],
     "menus": {
@@ -273,136 +307,146 @@
         {
           "command": "vscode-ibmi-fs.sendToDataQueue",
           "when": "resourceExtname == .DTAQ && activeCustomEditorId == vscode-ibmi-fs.editor",
-          "group": "navigation@1"
+          "group": "1_modification@1"
         },
         {
           "command": "vscode-ibmi-fs.clearDataQueue",
           "when": "resourceExtname == .DTAQ && activeCustomEditorId == vscode-ibmi-fs.editor",
-          "group": "navigation@2"
+          "group": "1_modification@2"
         },
         {
           "command": "vscode-ibmi-fs.downloadSavf",
           "when": "resourceExtname == .FILE && activeCustomEditorId == vscode-ibmi-fs.editor && ibmiFileType == 'SAVF'",
-          "group": "navigation@1"
+          "group": "1_modification@1"
         },
         {
           "command": "vscode-ibmi-fs.uploadSavf",
           "when": "resourceExtname == .FILE && activeCustomEditorId == vscode-ibmi-fs.editor && ibmiFileType == 'SAVF'",
-          "group": "navigation@2"
+          "group": "1_modification@2"
         },
         {
           "command": "vscode-ibmi-fs.savf",
           "when": "resourceExtname == .FILE && activeCustomEditorId == vscode-ibmi-fs.editor && ibmiFileType == 'SAVF'",
-          "group": "navigation@3"
+          "group": "1_modification@3"
         },
         {
           "command": "vscode-ibmi-fs.restore",
           "when": "resourceExtname == .FILE && activeCustomEditorId == vscode-ibmi-fs.editor && ibmiFileType == 'SAVF'",
-          "group": "navigation@4"
+          "group": "1_modification@4"
         },
         {
           "command": "vscode-ibmi-fs.clearSavf",
           "when": "resourceExtname == .FILE && activeCustomEditorId == vscode-ibmi-fs.editor && ibmiFileType == 'SAVF'",
-          "group": "navigation@5"
+          "group": "1_modification@5"
         },
         {
           "command": "vscode-ibmi-fs.HldJobq",
           "when": "resourceExtname == .JOBQ && activeCustomEditorId == vscode-ibmi-fs.editor",
-          "group": "navigation@1"
+          "group": "1_modification@1"
         },
         {
           "command": "vscode-ibmi-fs.RlsJobq",
           "when": "resourceExtname == .JOBQ && activeCustomEditorId == vscode-ibmi-fs.editor",
-          "group": "navigation@2"
+          "group": "1_modification@2"
         },
         {
           "command": "vscode-ibmi-fs.ClrJobq",
           "when": "resourceExtname == .JOBQ && activeCustomEditorId == vscode-ibmi-fs.editor",
-          "group": "navigation@3"
+          "group": "1_modification@3"
         },
         {
           "command": "vscode-ibmi-fs.HldOutq",
           "when": "resourceExtname == .OUTQ && activeCustomEditorId == vscode-ibmi-fs.editor",
-          "group": "navigation@1"
+          "group": "1_modification@1"
         },
         {
           "command": "vscode-ibmi-fs.RlsOutq",
           "when": "resourceExtname == .OUTQ && activeCustomEditorId == vscode-ibmi-fs.editor",
-          "group": "navigation@2"
+          "group": "1_modification@2"
         },
         {
           "command": "vscode-ibmi-fs.ClrOutq",
           "when": "resourceExtname == .OUTQ && activeCustomEditorId == vscode-ibmi-fs.editor",
-          "group": "navigation@3"
+          "group": "1_modification@3"
         },
         {
           "command": "vscode-ibmi-fs.ChgDtaara",
           "when": "resourceExtname == .DTAARA && activeCustomEditorId == vscode-ibmi-fs.editor",
-          "group": "navigation@1"
+          "group": "1_modification@1"
         },
         {
           "command": "vscode-ibmi-fs.DelOldSpool",
           "when": "resourceExtname == .OUTQ && activeCustomEditorId == vscode-ibmi-fs.editor",
-          "group": "navigation@4"
+          "group": "1_modification@4"
         },
         {
           "command": "vscode-ibmi-fs.MngWtr",
           "when": "resourceExtname == .OUTQ && activeCustomEditorId == vscode-ibmi-fs.editor",
-          "group": "navigation@5"
+          "group": "1_modification@5"
         },
         {
           "command": "vscode-ibmi-fs.chgUsrspc",
           "when": "resourceExtname == .USRSPC && activeCustomEditorId == vscode-ibmi-fs.editor",
-          "group": "navigation@1"
+          "group": "1_modification@1"
         },
         {
           "command": "vscode-ibmi-fs.Addbnddire",
           "when": "resourceExtname == .BNDDIR && activeCustomEditorId == vscode-ibmi-fs.editor",
-          "group": "navigation@1"
+          "group": "1_modification@1"
         },
         {
           "command": "vscode-ibmi-fs.GenJrnRcv",
           "when": "resourceExtname == .JRN && activeCustomEditorId == vscode-ibmi-fs.editor",
-          "group": "navigation@1"
+          "group": "1_modification@1"
         },
         {
           "command": "vscode-ibmi-fs.DspJrn",
           "when": "resourceExtname == .JRN && activeCustomEditorId == vscode-ibmi-fs.editor",
-          "group": "navigation@2"
+          "group": "1_modification@2"
         },
         {
           "command": "vscode-ibmi-fs.StrSbs",
           "when": "resourceExtname == .SBSD && activeCustomEditorId == vscode-ibmi-fs.editor",
-          "group": "navigation@1"
+          "group": "1_modification@1"
         },
         {
           "command": "vscode-ibmi-fs.EndSbs",
           "when": "resourceExtname == .SBSD && activeCustomEditorId == vscode-ibmi-fs.editor",
-          "group": "navigation@2"
+          "group": "1_modification@2"
         },
         {
           "command": "vscode-ibmi-fs.sendToMessageQueue",
           "when": "resourceExtname == .MSGQ && activeCustomEditorId == vscode-ibmi-fs.editor",
-          "group": "navigation@1"
+          "group": "1_modification@1"
         },
         {
           "command": "vscode-ibmi-fs.clearMessageQueue",
           "when": "resourceExtname == .MSGQ && activeCustomEditorId == vscode-ibmi-fs.editor",
-          "group": "navigation@2"
+          "group": "1_modification@2"
         },
         {
           "command": "vscode-ibmi-fs.QueryFile",
           "when": "resourceExtname == .FILE && activeCustomEditorId == vscode-ibmi-fs.editor && (ibmiFileType == 'PF' || ibmiFileType == 'LF')",
-          "group": "navigation@6"
+          "group": "1_modification@6"
         },
         {
           "command": "vscode-ibmi-fs.AddUsridxEntry",
           "when": "resourceExtname == .USRIDX && activeCustomEditorId == vscode-ibmi-fs.editor",
-          "group": "navigation@1"
+          "group": "1_modification@1"
         },
         {
           "command": "vscode-ibmi-fs.RmvUsridxEntry",
           "when": "resourceExtname == .USRIDX && activeCustomEditorId == vscode-ibmi-fs.editor",
+          "group": "1_modification@2"
+        },
+        {
+          "command": "vscode-ibmi-fs.refreshObject",
+          "when": "activeCustomEditorId == vscode-ibmi-fs.editor",
+          "group": "navigation@1"
+        },
+        {
+          "command": "vscode-ibmi-fs.showObjectActions",
+          "when": "activeCustomEditorId == vscode-ibmi-fs.editor",
           "group": "navigation@2"
         },
         {
@@ -525,6 +569,14 @@
         },
         {
           "command": "vscode-ibmi-fs.RmvUsridxEntry",
+          "when": "never"
+        },
+        {
+          "command": "vscode-ibmi-fs.refreshObject",
+          "when": "never"
+        },
+        {
+          "command": "vscode-ibmi-fs.showObjectActions",
           "when": "never"
         },
         {

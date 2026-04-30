@@ -95,8 +95,7 @@ export default class Cmd extends Base {
           TARGET_RELEASE
         FROM QSYS2.COMMAND_INFO
         WHERE COMMAND_LIBRARY = '${this.library}'
-        AND COMMAND_NAME = '${this.name}'
-        Fetch first row only`,
+        AND COMMAND_NAME = '${this.name}'`,
         'QSYS2',
         'COMMAND_INFO',
         'VIEW'

@@ -102,9 +102,8 @@ export namespace DataAreaActions {
       let dta = await executeSqlIfExists(
         connection,
         `SELECT DATA_AREA_TYPE, LENGTH, DECIMAL_POSITIONS, DATA_AREA_VALUE
-          FROM QSYS2.DATA_AREA_INFO
-          WHERE DATA_AREA_NAME = '${name}' AND DATA_AREA_LIBRARY = '${library}'
-          FETCH FIRST ROW ONLY`,
+          from table(QSYS2.DATA_AREA_INFO(DATA_AREA_NAME => '${name}',
+          DATA_AREA_LIBRARY => '${library}'))`,
         'QSYS2',
         'DATA_AREA_INFO',
         'VIEW'
@@ -278,9 +277,8 @@ export class Dtaara extends Base {
       this.dta = await executeSqlIfExists(
         connection,
         `SELECT DATA_AREA_TYPE
-         from QSYS2.DATA_AREA_INFO
-         WHERE DATA_AREA_NAME = '${this.name}' AND DATA_AREA_LIBRARY = '${this.library}'
-         Fetch first row only`,
+         from table(QSYS2.DATA_AREA_INFO(DATA_AREA_NAME => '${this.name}',
+          DATA_AREA_LIBRARY => '${this.library}'))`,
         'QSYS2',
         'DATA_AREA_INFO',
         'VIEW'
@@ -297,10 +295,11 @@ export class Dtaara extends Base {
         `select DATA_AREA_VALUE,
           DATA_AREA_TYPE,
           LENGTH,
-          TEXT_DESCRIPTION ${this.dta[0].DATA_AREA_TYPE === '*DEC' ? ', DECIMAL_POSITIONS' : ''}
-          from QSYS2.DATA_AREA_INFO
-          WHERE DATA_AREA_NAME = '${this.name}' AND DATA_AREA_LIBRARY = '${this.library}'
-          Fetch first row only`,
+          OBJTEXT AS TEXT_DESCRIPTION ${this.dta[0].DATA_AREA_TYPE === '*DEC' ? ', DECIMAL_POSITIONS' : ''}
+          from table(QSYS2.DATA_AREA_INFO(DATA_AREA_NAME => '${this.name}',
+            DATA_AREA_LIBRARY => '${this.library}')),
+          TABLE (QSYS2.OBJECT_STATISTICS(OBJECT_SCHEMA => '${this.library}', 
+            OBJTYPELIST => 'DTAARA', OBJECT_NAME => '${this.name}'))`,
         'QSYS2',
         'DATA_AREA_INFO',
         'VIEW'

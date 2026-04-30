@@ -22,6 +22,7 @@ import { generateDetailTable, getColumns, generateFastTable, FastTableColumn, ge
 import { Tools } from '@halcyontech/vscode-ibmi-types/api/Tools';
 import * as vscode from 'vscode';
 import ObjectProvider from '../objectProvider';
+import { JobOperations } from '../commonOperations';
 
 /**
  * Namespace containing actions for Job Queue objects
@@ -110,8 +111,7 @@ export namespace JobQueueActions {
         connection,
         `SELECT JOB_QUEUE_STATUS
           FROM QSYS2.JOB_QUEUE_INFO
-          WHERE JOB_QUEUE_NAME = '${name}' AND JOB_QUEUE_LIBRARY = '${library}'
-          Fetch first row only`,
+          WHERE JOB_QUEUE_NAME = '${name}' AND JOB_QUEUE_LIBRARY = '${library}'`,
         'QSYS2',
         'JOB_QUEUE_INFO',
         'VIEW'
@@ -173,8 +173,7 @@ export namespace JobQueueActions {
         connection,
         `SELECT JOB_QUEUE_STATUS
           FROM QSYS2.JOB_QUEUE_INFO
-          WHERE JOB_QUEUE_NAME = '${name}' AND JOB_QUEUE_LIBRARY = '${library}'
-          Fetch first row only`,
+          WHERE JOB_QUEUE_NAME = '${name}' AND JOB_QUEUE_LIBRARY = '${library}'`,
         'QSYS2',
         'JOB_QUEUE_INFO',
         'VIEW'
@@ -257,32 +256,7 @@ export namespace JobQueueActions {
    * @returns True if successful, false otherwise
    */
   export const hldJob = async (item: Entry): Promise<boolean> => {
-    // Show confirmation dialog to prevent accidental holds
-    const ibmi = getInstance();
-    const connection = ibmi?.getConnection();
-    if (connection) {
-      if (await vscode.window.showWarningMessage(vscode.l10n.t("Are you sure you want to hold job {0} ?", item.job), { modal: true }, vscode.l10n.t("Hold job"))) {
-        // Execute HLDJOB command on IBM i
-        const cmdrun: CommandResult = await connection.runCommand({
-          command: `QSYS/HLDJOB JOB(${item.job})`,
-          environment: `ile`
-        });
-
-        // Check command execution result
-        if (cmdrun.code === 0) {
-          vscode.window.showInformationMessage(vscode.l10n.t("Job held."));
-          return true;
-        } else {
-          vscode.window.showErrorMessage(vscode.l10n.t("Unable to hold selected job:\n{0}", String(cmdrun.stderr)));
-          return false;
-        }
-      } else {
-        return false;
-      } 
-    } else {
-      vscode.window.showErrorMessage(vscode.l10n.t("Not connected to IBM i"));
-      return false;
-    }
+    return JobOperations.holdJob({ job: item.job });
   };
 
   /**
@@ -292,33 +266,7 @@ export namespace JobQueueActions {
    * @returns True if successful, false otherwise
    */
   export const rlsJob = async (item: Entry): Promise<boolean> => {
-    // Show confirmation dialog
-    const ibmi = getInstance();
-    const connection = ibmi?.getConnection();
-    if (connection) {
-      if (await vscode.window.showWarningMessage(vscode.l10n.t("Are you sure you want to release job {0} ?", item.job), { modal: true }, vscode.l10n.t("Release job"))) {
-
-          // Execute RLSJOB command on IBM i
-          const cmdrun: CommandResult = await connection.runCommand({
-            command: `QSYS/RLSJOB JOB(${item.job})`,
-            environment: `ile`
-          });
-
-          // Check command execution result
-          if (cmdrun.code === 0) {
-            vscode.window.showInformationMessage(vscode.l10n.t("Job released."));
-            return true;
-          } else {
-            vscode.window.showErrorMessage(vscode.l10n.t("Unable to release selected job:\n{0}", String(cmdrun.stderr)));
-            return false;
-          }
-        } else {
-          return false;
-        }
-    } else {
-      vscode.window.showErrorMessage(vscode.l10n.t("Not connected to IBM i"));
-      return false;
-    }
+    return JobOperations.releaseJob({ job: item.job });
   };
 
   /**
@@ -328,33 +276,7 @@ export namespace JobQueueActions {
    * @returns True if successful, false otherwise
    */
   export const endJob = async (item: Entry): Promise<boolean> => {
-    // Show confirmation dialog to prevent accidental termination
-    const ibmi = getInstance();
-    const connection = ibmi?.getConnection();
-    if (connection) {
-      if (await vscode.window.showWarningMessage(vscode.l10n.t("Are you sure you want to end job {0} ?", item.job), { modal: true }, vscode.l10n.t("End job"))) {
-
-        // Execute ENDJOB command on IBM i
-        const cmdrun: CommandResult = await connection.runCommand({
-          command: `QSYS/ENDJOB JOB(${item.job})`,
-          environment: `ile`
-        });
-
-        // Check command execution result
-        if (cmdrun.code === 0) {
-          vscode.window.showInformationMessage(vscode.l10n.t("Job ended."));
-          return true;
-        } else {
-          vscode.window.showErrorMessage(vscode.l10n.t("Unable to end selected job:\n{0}", String(cmdrun.stderr)));
-          return false;
-        }
-      } else {
-        return false;
-      }
-    } else {
-      vscode.window.showErrorMessage(vscode.l10n.t("Not connected to IBM i"));
-      return false;    
-    }
+    return JobOperations.endJob({ job: item.job });
   };
 }
 
@@ -419,8 +341,7 @@ export default class Jobq extends Base {
         `SELECT JOB_QUEUE_STATUS, NUMBER_OF_JOBS, SUBSYSTEM_LIBRARY_NAME CONCAT '/' CONCAT SUBSYSTEM_NAME AS SUBSYSTEM_NAME, MAXIMUM_ACTIVE_JOBS, ACTIVE_JOBS, HELD_JOBS,
             RELEASED_JOBS, SCHEDULED_JOBS, TEXT_DESCRIPTION
           FROM QSYS2.JOB_QUEUE_INFO
-          WHERE JOB_QUEUE_NAME = '${this.name}' AND JOB_QUEUE_LIBRARY = '${this.library}'
-          Fetch first row only`,
+          WHERE JOB_QUEUE_NAME = '${this.name}' AND JOB_QUEUE_LIBRARY = '${this.library}'`,
         'QSYS2',
         'JOB_QUEUE_INFO',
         'VIEW'
