@@ -33,7 +33,10 @@
   "command.refreshObject.title": "Refresh Object",
   "command.showObjectActions.title": "Object Actions",
   "command.refreshWrksplf.title": "Refresh Spooled Files",
+  "command.refreshWrkjob.title": "Refresh Job Information",
+  "command.showWrkjobActions.title": "Job Actions",
   "command.wrksplf.title": "Work with Spooled Files",
+  "command.wrkjob.title": "Work with Job",
   "description": "File system provider for IBM i QSYS",
   "displayName": "IBM i FileSystem"
 }

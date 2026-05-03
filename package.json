@@ -314,6 +314,18 @@
         "icon": "$(refresh)"
       },
       {
+        "command": "vscode-ibmi-fs.refreshWrkjob",
+        "title": "%command.refreshWrkjob.title%",
+        "category": "IBM i FS",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "vscode-ibmi-fs.showWrkjobActions",
+        "title": "%command.showWrkjobActions.title%",
+        "category": "IBM i FS",
+        "icon": "$(menu)"
+      },
+      {
         "command": "vscode-ibmi-fs.wrksplf",
         "title": "%command.wrksplf.title%",
         "category": "FS Quick Start",
@@ -476,6 +488,16 @@
           "command": "vscode-ibmi-fs.refreshWrksplf",
           "when": "activeWebviewPanelId == 'wrksplfView'",
           "group": "navigation@1"
+        },
+        {
+          "command": "vscode-ibmi-fs.refreshWrkjob",
+          "when": "activeWebviewPanelId == 'wrkjobView'",
+          "group": "navigation@1"
+        },
+        {
+          "command": "vscode-ibmi-fs.showWrkjobActions",
+          "when": "activeWebviewPanelId == 'wrkjobView'",
+          "group": "navigation@2"
         }
       ],
       "view/item/context": [

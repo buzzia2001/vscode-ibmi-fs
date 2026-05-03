@@ -34,6 +34,9 @@
   "command.showObjectActions.title": "Azioni oggetto",
   "command.refreshWrksplf.title": "Aggiorna Spooled Files",
   "command.wrksplf.title": "Lavora con Spooled Files",
+  "command.refreshWrkjob.title": "Aggiorna informazioni Job",
+  "command.wrkjob.title": "Lavora con Job",
+  "command.showWrkjobActions.title": "Azioni Job",
   "description": "Browser del file system per IBM i QSYS",
   "displayName": "IBM i FileSystem"
 }

@@ -18,6 +18,7 @@ import { FileActions } from './types/file';
 import { UserIndexActions } from './types/userIndex';
 import { DspobjActions } from './dspobj';
 import { WrksplfActions } from './views/wrksplf';
+import { WrkjobActions } from './views/wrkjob';
 import { DocumentManager } from './documentManager';
 
 /**
@@ -55,6 +56,7 @@ export async function activate(context: vscode.ExtensionContext) {
   UserIndexActions.register(context);
   DspobjActions.register(context);
   WrksplfActions.register(context);
+  WrkjobActions.register(context);
 
   // Register refresh command
   context.subscriptions.push(
@@ -225,6 +227,7 @@ export async function activate(context: vscode.ExtensionContext) {
           { label: `$(extensions-info-message) DSPOBJ`, description: vscode.l10n.t(`Display Object Information`), command: `vscode-ibmi-fs.dspobj` },
           { label: `$(search-view-icon) DSPOBJ Detailed`, description: vscode.l10n.t(`Display Object Information (single input)`), command: `vscode-ibmi-fs.dspobjDetailed` },
           { label: `$(output-view-icon) WRKSPLF`, description: vscode.l10n.t(`Work with Spooled Files`), command: `vscode-ibmi-fs.wrksplf` },
+          { label: `$(server-process) WRKJOB`, description: vscode.l10n.t(`Work with Job`), command: `vscode-ibmi-fs.wrkjob` },
 
         ],
         { placeHolder: vscode.l10n.t('Select an FS action') }

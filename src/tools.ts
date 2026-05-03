@@ -1162,13 +1162,20 @@ export function generateFastTable<T>(options: FastTableOptions<T>): string {
       const data = collapsibleDataArray[rowIndex];
       if (!data || data.length === 0) return;
 
+      // Helper function to escape HTML
+      const escapeHtml = (text) => {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      };
+
       // Set modal content
       const content = data.map(item => \`
         <div style="margin-bottom: 16px;">
           <div style="font-weight: 600; margin-bottom: 8px; color: var(--vscode-foreground); font-size: 1em;">
-            \${item.title}:
+            \${escapeHtml(item.title)}:
           </div>
-          <pre>\${item.value}</pre>
+          <pre>\${escapeHtml(item.value || '')}</pre>
         </div>
       \`).join('');
 
