@@ -28,6 +28,7 @@
   "command.uploadSavf.title": "Télécharger le fichier de sauvegarde",
   "command.dspobj.title": "Informations sur l'objet",
   "command.dspmsgQsysopr.title": "Afficher les messages QSYSOPR",
+  "command.dspUsrMsg.title": "Afficher les messages de l'utilisateur",
   "command.dspobjDetailed.title": "Afficher les informations sur l'objet (Détaillé)",
   "command.refreshObject.title": "Actualiser l'objet",
   "command.showObjectActions.title": "Actions de l'objet",

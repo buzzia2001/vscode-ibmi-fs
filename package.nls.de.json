@@ -28,6 +28,7 @@
   "command.uploadSavf.title": "Datei hochladen und speichern",
   "command.dspobj.title": "Objektinformationen",
   "command.dspmsgQsysopr.title": "QSYSOPR-Nachrichten anzeigen",
+  "command.dspUsrMsg.title": "Benutzernachrichten anzeigen",
   "command.dspobjDetailed.title": "Objektinformationen anzeigen (Detailliert)",
   "command.refreshObject.title": "Objekt aktualisieren",
   "command.showObjectActions.title": "Objektaktionen",

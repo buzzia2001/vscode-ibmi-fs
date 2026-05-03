@@ -28,6 +28,7 @@
   "command.uploadSavf.title": "セーブデータをアップロード",
   "command.dspobj.title": "オブジェクト情報",
   "command.dspmsgQsysopr.title": "QSYSOPRメッセージを表示",
+  "command.dspUsrMsg.title": "ユーザーメッセージを表示",
   "command.dspobjDetailed.title": "オブジェクト情報を表示（詳細）",
   "command.refreshObject.title": "オブジェクトを更新",
   "command.showObjectActions.title": "オブジェクトアクション",

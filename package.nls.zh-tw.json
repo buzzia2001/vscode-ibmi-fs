@@ -28,6 +28,7 @@
   "command.uploadSavf.title": "上傳儲存檔案",
   "command.dspobj.title": "物件資訊",
   "command.dspmsgQsysopr.title": "顯示 QSYSOPR 訊息",
+  "command.dspUsrMsg.title": "顯示使用者訊息",
   "command.dspobjDetailed.title": "顯示物件資訊（詳細）",
   "command.refreshObject.title": "重新整理物件",
   "command.showObjectActions.title": "物件動作",

@@ -284,6 +284,12 @@
         "icon": "$(mail)"
       },
       {
+        "command": "vscode-ibmi-fs.dspUsrMsg",
+        "title": "%command.dspUsrMsg.title%",
+        "category": "FS Quick Start",
+        "icon": "$(mail)"
+      },
+      {
         "command": "vscode-ibmi-fs.dspobjDetailed",
         "title": "%command.dspobjDetailed.title%",
         "category": "FS Quick Start",

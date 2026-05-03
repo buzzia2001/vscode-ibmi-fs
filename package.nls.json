@@ -28,6 +28,7 @@
   "command.uploadSavf.title": "Upload Save File",
   "command.dspobj.title": "Additional Information",
   "command.dspmsgQsysopr.title": "Display QSYSOPR Messages",
+  "command.dspUsrMsg.title": "Display User Messages",
   "command.dspobjDetailed.title": "Display Object Information (Detailed)",
   "command.refreshObject.title": "Refresh Object",
   "command.showObjectActions.title": "Object Actions",

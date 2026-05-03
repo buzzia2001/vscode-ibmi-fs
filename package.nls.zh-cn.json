@@ -28,6 +28,7 @@
   "command.uploadSavf.title": "上传保存文件",
   "command.dspobj.title": "对象信息",
   "command.dspmsgQsysopr.title": "显示 QSYSOPR 消息",
+  "command.dspUsrMsg.title": "显示用户消息",
   "command.dspobjDetailed.title": "显示对象信息（详细）",
   "command.refreshObject.title": "刷新对象",
   "command.showObjectActions.title": "对象操作",
