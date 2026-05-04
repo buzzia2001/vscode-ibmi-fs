@@ -218,6 +218,16 @@ export namespace SubsystemActions {
   };
 
   /**
+   * Hold an individual job in the subsystem
+   * Prevents the job from executing until it is released
+   * @param item - The job entry to hold
+   * @returns True if successful, false otherwise
+   */
+  export const holdJob = async (item: Job): Promise<boolean> => {
+    return JobOperations.holdJob({ job: item.job });
+  };
+
+  /**
    * End (terminate) an individual job in the subsystem
    * This is a destructive operation that immediately stops the job
    * @param item - The job entry to end
@@ -225,6 +235,17 @@ export namespace SubsystemActions {
    */
   export const endJob = async (item: Job): Promise<boolean> => {
     return JobOperations.endJob({ job: item.job }, '*IMMED');
+  };
+
+  /**
+   * Open Work with Job view for an individual job
+   * Shows detailed information about the job in a webview
+   * @param item - The job entry to view
+   * @returns True if successful, false otherwise
+   */
+  export const wrkJob = async (item: Job): Promise<boolean> => {
+    await vscode.commands.executeCommand("vscode-ibmi-fs.wrkjob", item.job);
+    return true;
   };
 }
 
@@ -751,6 +772,26 @@ export class Sbsd extends Base {
     switch (uri.path) {
       // Individual job actions
 
+      case "holdJob":
+        // Hold a specific job in the subsystem
+        entryJson = params.get("entry");
+        if (entryJson) {
+          const entry: Job = JSON.parse(decodeURIComponent(entryJson));
+          if(await SubsystemActions.holdJob(entry)){
+            refetch=true;
+          }
+        }
+        break;
+
+      case "wrkJob":
+        // Open Work with Job view for a specific job
+        entryJson = params.get("entry");
+        if (entryJson) {
+          const entry: Job = JSON.parse(decodeURIComponent(entryJson));
+          await SubsystemActions.wrkJob(entry);
+        }
+        break;
+
       case "endJob":
         // End (terminate) a specific job in the queue
         entryJson = params.get("entry");
@@ -1107,11 +1148,13 @@ function renderJobs(data: Job[]) {
     { title: vscode.l10n.t("I/O"), width: "0.5fr", getValue: e => String(e.io) },
     {
       title: vscode.l10n.t("Actions"),
-      width: "1fr",
+      width: "2fr",
       getValue: e => {
         // Encode job entry as URL parameter for action handlers
         const arg = encodeURIComponent(JSON.stringify(e));
-        return `<vscode-button appearance="secondary" href="action:endJob?entry=${arg}">${vscode.l10n.t("End")}</vscode-button>`;
+        return `<vscode-button appearance="primary" href="action:wrkJob?entry=${arg}">${vscode.l10n.t("Details")}</vscode-button>
+                <vscode-button appearance="secondary" href="action:holdJob?entry=${arg}">${vscode.l10n.t("Hold")}</vscode-button>
+                <vscode-button appearance="secondary" href="action:endJob?entry=${arg}">${vscode.l10n.t("End")}</vscode-button>`;
       }
     }
   ];

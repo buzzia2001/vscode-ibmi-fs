@@ -278,6 +278,17 @@ export namespace JobQueueActions {
   export const endJob = async (item: Entry): Promise<boolean> => {
     return JobOperations.endJob({ job: item.job });
   };
+
+  /**
+   * Open Work with Job view for an individual job
+   * Shows detailed information about the job in a webview
+   * @param item - The job entry to view
+   * @returns True if successful, false otherwise
+   */
+  export const wrkJob = async (item: Entry): Promise<boolean> => {
+    await vscode.commands.executeCommand("vscode-ibmi-fs.wrkjob", item.job);
+    return true;
+  };
 }
 
 /**
@@ -491,16 +502,17 @@ export default class Jobq extends Base {
       { title: vscode.l10n.t("Job status"), width: "1fr", getValue: e => e.jobsts },
       {
         title: vscode.l10n.t("Actions"),
-        width: "1fr",
+        width: "2fr",
         getValue: e => {
           // Encode job entry as URL parameter for action handlers
           const arg = encodeURIComponent(JSON.stringify(e));
           
           // Conditionally show Hold or Release button based on job status
           // If job is HELD, show Release button; otherwise show Hold button
-          return `${e.jobsts!=='HELD'?`<vscode-button appearance="primary" href="action:hldJob?entry=${arg}">${vscode.l10n.t("Hold")}</vscode-button>`:
-            `<vscode-button appearance="primary" href="action:rlsJob?entry=${arg}">${vscode.l10n.t("Release")}</vscode-button>`}
-            <vscode-button appearance="secondary" href="action:endJob?entry=${arg}">${vscode.l10n.t("End")}</vscode-button>`;
+          return `<vscode-button appearance="primary" href="action:wrkJob?entry=${arg}">${vscode.l10n.t("Details")}</vscode-button>
+                  ${e.jobsts!=='HELD'?`<vscode-button appearance="secondary" href="action:hldJob?entry=${arg}">${vscode.l10n.t("Hold")}</vscode-button>`:
+            `<vscode-button appearance="secondary" href="action:rlsJob?entry=${arg}">${vscode.l10n.t("Release")}</vscode-button>`}
+                  <vscode-button appearance="secondary" href="action:endJob?entry=${arg}">${vscode.l10n.t("End")}</vscode-button>`;
         }
       }
     ];
@@ -548,6 +560,15 @@ export default class Jobq extends Base {
     // Route to appropriate action handler based on action type
     switch (uri.path) {
       // Individual job actions
+      case "wrkJob":
+        // Open Work with Job view for a specific job
+        entryJson = params.get("entry");
+        if (entryJson) {
+          const entry: Entry = JSON.parse(decodeURIComponent(entryJson));
+          await JobQueueActions.wrkJob(entry);
+        }
+        break;
+
       case "hldJob":
         // Hold a specific job in the queue
         entryJson = params.get("entry");

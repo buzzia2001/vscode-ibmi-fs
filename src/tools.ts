@@ -610,12 +610,21 @@ export function generateFastTable<T>(options: FastTableOptions<T>): string {
   const rows = data.map((row, rowIndex) => {
     const visibleCells = columns.map((col, index) => {
       if (col.collapsible) {
-        // For collapsible columns, show a button to open modal
-        return `<vscode-table-cell style="width: ${columnsArray[index]}; text-align: center;">
-          <vscode-button appearance="secondary" class="show-modal-btn" data-row="${rowIndex}" aria-label="Show details">
-            +
-          </vscode-button>
-        </vscode-table-cell>`;
+        // For collapsible columns, check if value is empty/null before showing button
+        const value = col.getValue(row);
+        const isEmpty = value === null || value === undefined || value === '' || String(value).trim() === '' || String(value) === 'null' || String(value) === 'undefined';
+        
+        if (isEmpty) {
+          // Show empty cell if no content
+          return `<vscode-table-cell style="width: ${columnsArray[index]}; text-align: center;"></vscode-table-cell>`;
+        } else {
+          // Show button to open modal if content exists
+          return `<vscode-table-cell style="width: ${columnsArray[index]}; text-align: center;">
+            <vscode-button appearance="secondary" class="show-modal-btn" data-row="${rowIndex}" aria-label="Show details">
+              +
+            </vscode-button>
+          </vscode-table-cell>`;
+        }
       }
       const value = col.getValue(row);
       const cellClass = col.cellClass ? ` class="${col.cellClass}"` : '';

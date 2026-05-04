@@ -25,10 +25,37 @@ import { Tools } from '@halcyontech/vscode-ibmi-types/api/Tools';
  */
 export namespace WrkjobActions {
   /**
+   * Map to store refresh functions and panels for each active wrkjob
+   */
+  const activePanels = new Map<string, {
+    panel: vscode.WebviewPanel;
+    refreshFn: () => Promise<void>;
+  }>();
+
+  /**
+   * Currently active panel (last one that received focus)
+   */
+  let currentActivePanel: string | undefined;
+
+  /**
    * Register Work with Job commands with VS Code
    * @param context - Extension context
    */
   export const register = (context: vscode.ExtensionContext) => {
+    // Register the static refresh command once
+    context.subscriptions.push(
+      vscode.commands.registerCommand('vscode-ibmi-fs.refreshWrkjob', async () => {
+        if (currentActivePanel) {
+          const panelInfo = activePanels.get(currentActivePanel);
+          if (panelInfo) {
+            await panelInfo.refreshFn();
+            return;
+          }
+        }
+        vscode.window.showWarningMessage(vscode.l10n.t("No active job view found to refresh"));
+      })
+    );
+
     context.subscriptions.push(
       vscode.commands.registerCommand("vscode-ibmi-fs.wrkjob", async (jobName?: string) => {
         if (!jobName) {
@@ -50,28 +77,8 @@ export namespace WrkjobActions {
         }
       }),
       vscode.commands.registerCommand("vscode-ibmi-fs.showWrkjobActions", async () => {
-        // Get the active webview panel
-        const activePanel = vscode.window.activeTextEditor;
-        
-        // Try to get job name from the active webview title
-        // The title format is "Work with Job: jobname"
-        let jobName: string | undefined;
-        
-        // Check if there's an active webview with the correct viewType
-        const panels = (vscode.window as any).tabGroups?.activeTabGroup?.tabs;
-        if (panels) {
-          for (const tab of panels) {
-            if (tab.input?.viewType === 'wrkjobView') {
-              const label = tab.label;
-              // Extract job name from "Work with Job: 123456/USER/JOBNAME"
-              const match = label.match(/:\s*(.+)$/);
-              if (match) {
-                jobName = match[1].trim();
-              }
-              break;
-            }
-          }
-        }
+        // Use the currentActivePanel to get the job name
+        let jobName: string | undefined = currentActivePanel;
         
         if (!jobName) {
           vscode.window.showErrorMessage(vscode.l10n.t("No active job view found"));
@@ -95,29 +102,24 @@ export namespace WrkjobActions {
           }
           
           const jobStatus = jobInfo[0].JOB_STATUS;
+          const activeStatus = jobInfo[0].ACTIVE_STATUS;
           
           // Build action list based on job status
           const actions: vscode.QuickPickItem[] = [];
           
-          if (jobStatus === 'HELD') {
+          if (jobStatus === 'ACTIVE' && activeStatus==='HLD') {
             actions.push({
               label: vscode.l10n.t("$(play) Release Job"),
-              description: vscode.l10n.t("Release the held job"),
-              detail: jobName
             });
-          } else if (jobStatus !== '*ENDED') {
+          } else if (jobStatus === 'ACTIVE' && activeStatus!=='HLD') {
             actions.push({
               label: vscode.l10n.t("$(debug-pause) Hold Job"),
-              description: vscode.l10n.t("Hold the job"),
-              detail: jobName
             });
           }
           
-          if (jobStatus !== '*ENDED') {
+          if (jobStatus !== 'OUTQ') {
             actions.push({
               label: vscode.l10n.t("$(close) End Job"),
-              description: vscode.l10n.t("End the job"),
-              detail: jobName
             });
           }
           
@@ -297,36 +299,45 @@ export namespace WrkjobActions {
     // Fetch job info
     const jobInfo = await executeSqlIfExists(
       connection,
-      `SELECT JOB_STATUS,
-         JOB_TYPE,
-         JOB_SUBSYSTEM,
-         JOB_DESCRIPTION_LIBRARY CONCAT '/' CONCAT JOB_DESCRIPTION AS JOB_DESCRIPTION,
-         SUBMITTER_JOB_NAME,
-         TO_CHAR(JOB_ENTERED_SYSTEM_TIME, 'yyyy-mm-dd HH24:mi') AS JOB_ENTERED_SYSTEM_TIME,
-         TO_CHAR(JOB_SCHEDULED_TIME, 'yyyy-mm-dd HH24:mi') AS JOB_SCHEDULED_TIME,
-         TO_CHAR(JOB_ACTIVE_TIME, 'yyyy-mm-dd HH24:mi') AS JOB_ACTIVE_TIME,
-         TO_CHAR(JOB_END_TIME, 'yyyy-mm-dd HH24:mi') AS JOB_END_TIME,
-         JOB_END_SEVERITY,
-         COMPLETION_STATUS,
-         JOB_QUEUE_LIBRARY CONCAT '/' CONCAT JOB_QUEUE_NAME AS JOB_QUEUE_NAME,
-         ALLOW_MULTIPLE_THREADS,
-         PEAK_TEMPORARY_STORAGE,
-         DEFAULT_WAIT,
-         MAXIMUM_PROCESSING_TIME_ALLOWED,
-         MAXIMUM_TEMPORARY_STORAGE_ALLOWED,
-         "CCSID",
-         CHARACTER_IDENTIFIER_CONTROL,
-         DATE_FORMAT,
-         DATE_SEPARATOR,
-         TIME_SEPARATOR,
-         DECIMAL_FORMAT,
-         MESSAGE_LOGGING_LEVEL CONCAT ' ' CONCAT MESSAGE_LOGGING_SEVERITY CONCAT ' ' CONCAT MESSAGE_LOGGING_TEXT AS MESSAGE_LOGGING_LEVEL,
-         INQUIRY_MESSAGE_REPLY,
-         SPOOLED_FILE_ACTION
+      `SELECT P.JOB_STATUS,
+       X.JOB_STATUS AS ACTIVE_STATUS,
+       X.FUNCTION_TYPE CONCAT '-' CONCAT X."FUNCTION" AS "FUNCTION",
+       P.JOB_TYPE,
+       P.JOB_SUBSYSTEM,
+       P.JOB_DESCRIPTION_LIBRARY CONCAT '/' CONCAT P.JOB_DESCRIPTION AS JOB_DESCRIPTION,
+       P.SUBMITTER_JOB_NAME,
+       TO_CHAR(P.JOB_ENTERED_SYSTEM_TIME, 'yyyy-mm-dd HH24:mi') AS JOB_ENTERED_SYSTEM_TIME,
+       TO_CHAR(P.JOB_SCHEDULED_TIME, 'yyyy-mm-dd HH24:mi') AS JOB_SCHEDULED_TIME,
+       TO_CHAR(P.JOB_ACTIVE_TIME, 'yyyy-mm-dd HH24:mi') AS JOB_ACTIVE_TIME,
+       TO_CHAR(P.JOB_END_TIME, 'yyyy-mm-dd HH24:mi') AS JOB_END_TIME,
+       P.JOB_END_SEVERITY,
+       P.COMPLETION_STATUS,
+       P.JOB_QUEUE_LIBRARY CONCAT '/' CONCAT JOB_QUEUE_NAME AS JOB_QUEUE_NAME,
+       P.ALLOW_MULTIPLE_THREADS,
+       P.PEAK_TEMPORARY_STORAGE,
+       P.DEFAULT_WAIT,
+       P.MAXIMUM_PROCESSING_TIME_ALLOWED,
+       P.MAXIMUM_TEMPORARY_STORAGE_ALLOWED,
+       P."CCSID",
+       P.CHARACTER_IDENTIFIER_CONTROL,
+       P.DATE_FORMAT,
+       P.DATE_SEPARATOR,
+       P.TIME_SEPARATOR,
+       P.DECIMAL_FORMAT,
+       MESSAGE_LOGGING_LEVEL CONCAT ' ' CONCAT MESSAGE_LOGGING_SEVERITY CONCAT ' ' CONCAT MESSAGE_LOGGING_TEXT
+           AS MESSAGE_LOGGING_LEVEL,
+       INQUIRY_MESSAGE_REPLY,
+       SPOOLED_FILE_ACTION
        FROM TABLE(QSYS2.JOB_INFO(JOB_STATUS_FILTER => '*ALL', 
                                   JOB_USER_FILTER => '${jobUser}', 
-                                  JOB_NAME_FILTER => '${jobNameOnly}'))
-       WHERE JOB_NAME = '${jobName}'`,
+                                  JOB_NAME_FILTER => '${jobNameOnly}')) p
+       LEFT JOIN TABLE (
+            QSYS2.ACTIVE_JOB_INFO(JOB_NAME_FILTER => '${jobNameOnly}', 
+                                  CURRENT_USER_LIST_FILTER => '${jobUser}', 
+                                  DETAILED_INFO => 'NONE')
+             ) X
+             ON X.JOB_NAME = P.JOB_NAME
+       WHERE P.JOB_NAME = '${jobName}'`,
       'QSYS2',
       'JOB_INFO',
       'FUNCTION'
@@ -579,6 +590,8 @@ export namespace WrkjobActions {
       // Define columns for job info manually
       const columns = new Map<string, string>([
         ['JOB_STATUS', vscode.l10n.t('Job Status')],
+        ['ACTIVE_STATUS', vscode.l10n.t('Active Status')],
+        ['FUNCTION', vscode.l10n.t('Function')],
         ['JOB_TYPE', vscode.l10n.t('Job Type')],
         ['JOB_SUBSYSTEM', vscode.l10n.t('Subsystem')],
         ['JOB_DESCRIPTION', vscode.l10n.t('Job Description')],
@@ -617,8 +630,8 @@ export namespace WrkjobActions {
         }
       );
 
-      // Add refresh button to the webview toolbar
-      const refreshDisposable = vscode.commands.registerCommand('vscode-ibmi-fs.refreshWrkjob', async () => {
+      // Define refresh function for this panel
+      const refreshFunction = async () => {
         // First, tell the webview to save its current state with the restore flag
         // This must happen BEFORE we update the HTML
         await panel.webview.postMessage({
@@ -645,11 +658,27 @@ export namespace WrkjobActions {
           panel.webview.html = generatePage(generateContent());
           vscode.window.showInformationMessage(vscode.l10n.t('Job information refreshed successfully'));
         }
+      };
+
+      // Store the panel and refresh function
+      activePanels.set(jobName, { panel, refreshFn: refreshFunction });
+      
+      // Track when this panel becomes active
+      panel.onDidChangeViewState(e => {
+        if (e.webviewPanel.active) {
+          currentActivePanel = jobName;
+        }
       });
 
-      // Clean up the command when panel is disposed
+      // Set as current active panel immediately
+      currentActivePanel = jobName;
+
+      // Clean up when panel is disposed
       panel.onDidDispose(() => {
-        refreshDisposable.dispose();
+        activePanels.delete(jobName);
+        if (currentActivePanel === jobName) {
+          currentActivePanel = undefined;
+        }
       });
 
       // Generate HTML content
@@ -665,18 +694,6 @@ export namespace WrkjobActions {
             <div style="margin-top: 16px; display: flex; gap: 8px;">
               <vscode-button appearance="primary" href="action:releaseJob">
                 ${vscode.l10n.t("Release Job")}
-              </vscode-button>
-              <vscode-button appearance="secondary" href="action:endJob">
-                ${vscode.l10n.t("End Job")}
-              </vscode-button>
-            </div>
-          `;
-        } else if (jobStatus && jobStatus !== 'ENDED') {
-          // If job is active (not held and not ended), show Hold and End buttons
-          actionButtons = `
-            <div style="margin-top: 16px; display: flex; gap: 8px;">
-              <vscode-button appearance="primary" href="action:holdJob">
-                ${vscode.l10n.t("Hold Job")}
               </vscode-button>
               <vscode-button appearance="secondary" href="action:endJob">
                 ${vscode.l10n.t("End Job")}
@@ -781,7 +798,7 @@ export namespace WrkjobActions {
         const joblogColumns: FastTableColumn<JoblogEntry>[] = [
           { title: vscode.l10n.t("MSGID"), width: "0.7fr", getValue: e => e.msgid },
           { title: vscode.l10n.t("Message"), width: "2fr", getValue: e => e.msgtext },
-          { title: vscode.l10n.t("Second Level"), width: "2fr", getValue: e => e.msgtext2, collapsible: true },
+          { title: vscode.l10n.t("Second Level"), width: "0.3fr", getValue: e => e.msgtext2.replaceAll('&N','\n').replaceAll('&B','\n\t').replaceAll('&P','\n\t'), collapsible: true },
           { title: vscode.l10n.t("Sev."), width: "0.3fr", getValue: e => String(e.severity) },
           { title: vscode.l10n.t("From Program"), width: "1.5fr", getValue: e => e.fromProgram },
           { title: vscode.l10n.t("Timestamp"), width: "1.2fr", getValue: e => e.timestamp }
@@ -793,7 +810,8 @@ export namespace WrkjobActions {
           columns: joblogColumns,
           data: joblog,
           stickyHeader: true,
-          emptyMessage: vscode.l10n.t("No job log messages found.")
+          emptyMessage: vscode.l10n.t("No job log messages found."),
+          tableId: 'joblog-table'
         });
 
         // Statistics tab (combines call stack, locks, open files, spools)

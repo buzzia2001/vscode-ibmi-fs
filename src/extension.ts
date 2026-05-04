@@ -16,7 +16,7 @@ import { SubsystemActions } from './types/subsystemDescription';
 import { MessageQueueActions } from './types/messageQueue';
 import { FileActions } from './types/file';
 import { UserIndexActions } from './types/userIndex';
-import { DspobjActions } from './dspobj';
+import { DspobjActions } from './views/dspobj';
 import { WrksplfActions } from './views/wrksplf';
 import { WrkjobActions } from './views/wrkjob';
 import { DocumentManager } from './documentManager';
